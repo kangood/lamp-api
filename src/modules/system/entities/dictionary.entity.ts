@@ -5,7 +5,8 @@ import {
     Entity,
     UpdateDateColumn,
     Index,
-    PrimaryGeneratedColumn,
+    PrimaryColumn,
+    Generated,
 } from 'typeorm';
 
 @Exclude()
@@ -13,7 +14,15 @@ import {
 @Entity('c_dictionary', { schema: 'lamp_generator' })
 export class DictionaryEntity {
     @Expose()
-    @PrimaryGeneratedColumn({ type: 'bigint', name: 'id', comment: 'ID' })
+    @Generated()
+    @PrimaryColumn('bigint', {
+        name: 'id',
+        comment: 'ID',
+        transformer: {
+            to: (value) => value,
+            from: (value) => parseInt(value, 10),
+        },
+    })
     id: number;
 
     @Expose()
