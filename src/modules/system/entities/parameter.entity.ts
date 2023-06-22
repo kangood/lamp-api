@@ -2,18 +2,17 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    PrimaryGeneratedColumn,
     UpdateDateColumn,
     Index,
+    DeleteDateColumn,
 } from 'typeorm';
+
+import { BaseEntity } from '@/modules/database/base';
 
 @Index('uk_key', ['key'], { unique: true })
 @Index('uk_param_key', ['tenantCode', 'key'], { unique: true })
 @Entity('c_parameter', { schema: 'lamp_generator' })
-export class ParameterEntity {
-    @PrimaryGeneratedColumn({ type: 'bigint', name: 'id', comment: 'ID' })
-    id: number;
-
+export class ParameterEntity extends BaseEntity {
     @Column('varchar', {
         name: 'key_',
         unique: true,
@@ -59,19 +58,22 @@ export class ParameterEntity {
     updatedBy: string | null;
 
     @CreateDateColumn({
-        name: 'create_at',
+        name: 'created_at',
         nullable: true,
         comment: '创建时间',
     })
-    createAt: Date | null;
+    createdAt: Date | null;
 
     @UpdateDateColumn({
-        name: 'update_at',
+        name: 'updated_at',
         nullable: true,
         comment: '更新时间',
     })
-    updateAt: Date | null;
+    updatedAt: Date | null;
 
     @Column('varchar', { name: 'tenant_code', comment: '租户编码', length: 20 })
     tenantCode: string;
+
+    @DeleteDateColumn({ name: 'deleted_at', comment: '删除时间', nullable: true })
+    deletedAt: Date | null;
 }

@@ -14,4 +14,5 @@ export const database = (): TypeOrmModuleOptions => ({
     database: 'lamp_nestjs',
     synchronize: false,
     autoLoadEntities: true,
+    bigNumberStrings: false,
 });

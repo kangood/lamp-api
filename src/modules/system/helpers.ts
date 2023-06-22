@@ -1,6 +1,6 @@
-import { ValueTransformer } from 'typeorm';
+import { SnowflakeIdv1 } from 'simple-flakeid';
 
-export const bigint: ValueTransformer = {
-    to: (entityValue: bigint) => entityValue,
-    from: (databaseValue: string): bigint => BigInt(databaseValue),
+export const getSnowflakeId = () => {
+    const snowflakeIdv1 = new SnowflakeIdv1({ workerId: 1 });
+    return snowflakeIdv1.NextNumber();
 };

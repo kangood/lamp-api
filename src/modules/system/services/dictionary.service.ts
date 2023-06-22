@@ -1,67 +1,50 @@
 import { Injectable } from '@nestjs/common';
+import { omit } from 'lodash';
 
-import { isFunction, isNil, omit } from 'lodash';
+import { SelectQueryBuilder } from 'typeorm';
 
-import { SelectQueryBuilder, EntityNotFoundError } from 'typeorm';
+import { BaseService } from '@/modules/database/base';
 
-import { paginate } from '@/modules/database/helpers';
 import { QueryHook } from '@/modules/database/types';
+import { DictionaryOrderType } from '@/modules/system/constants';
+import { getSnowflakeId } from '@/modules/system/helpers';
 
 import { CreateDictionaryDto, QueryDictionaryDto, UpdateDictionaryDto } from '../dtos';
 import { DictionaryEntity } from '../entities';
 import { DictionaryRepository } from '../repositories';
 
-// 文章查询接口
+// 字典查询接口
 type FindParams = {
     [key in keyof Omit<QueryDictionaryDto, 'limit' | 'page'>]: QueryDictionaryDto[key];
 };
 
 /**
- * 文章数据操作
+ * 字典数据操作
  */
 @Injectable()
-export class DictionaryService {
-    constructor(protected repository: DictionaryRepository) {}
-
-    /**
-     * 获取分页数据
-     * @param options 分页选项
-     * @param callback 添加额外的查询
-     */
-    async paginate(options: QueryDictionaryDto, callback?: QueryHook<DictionaryEntity>) {
-        const qb = await this.buildListQuery(this.repository.buildBaseQB(), options, callback);
-        return paginate(qb, options);
+export class DictionaryService extends BaseService<
+    DictionaryEntity,
+    DictionaryRepository,
+    FindParams
+> {
+    constructor(protected repository: DictionaryRepository) {
+        super(repository);
     }
 
     /**
-     * 查询单篇文章
-     * @param id
-     * @param callback 添加额外的查询
-     */
-    async detail(id: number, callback?: QueryHook<DictionaryEntity>) {
-        let qb = this.repository.buildBaseQB();
-        qb.where(`dict.id = :id`, { id });
-        qb = !isNil(callback) && isFunction(callback) ? await callback(qb) : qb;
-        const item = await qb.getOne();
-        if (!item)
-            throw new EntityNotFoundError(DictionaryEntity, `The Dictionary ${id} not exists!`);
-        return item;
-    }
-
-    /**
-     * 创建文章
+     * 新建字典值
      * @param data
      */
     async create(data: CreateDictionaryDto) {
         const createDictionaryDto = {
             ...data,
-            status: 1,
+            id: getSnowflakeId(),
         };
         return this.repository.save(createDictionaryDto);
     }
 
     /**
-     * 更新文章
+     * 更新字典值
      * @param data
      */
     async update(data: UpdateDictionaryDto) {
@@ -70,27 +53,38 @@ export class DictionaryService {
     }
 
     /**
-     * 删除文章
-     * @param id
-     */
-    async delete(id: number) {
-        const item = await this.repository.findOneByOrFail({ id });
-        return this.repository.remove(item);
-    }
-
-    /**
      * 构建文章列表查询器
-     * @param qb 初始查询构造器
+     * @param queryBuilder 初始查询构造器
      * @param options 排查分页选项后的查询选项
      * @param callback 添加额外的查询
      */
-    protected async buildListQuery(
-        qb: SelectQueryBuilder<DictionaryEntity>,
+    protected async buildListQB(
+        queryBuilder: SelectQueryBuilder<DictionaryEntity>,
         options: FindParams,
         callback?: QueryHook<DictionaryEntity>,
     ) {
-        // 复杂逻辑省略...
-        if (callback) return callback(qb);
+        const { orderBy } = options;
+        const qb = await super.buildListQB(queryBuilder, options, callback);
+        this.addOrderByQuery(qb, orderBy);
         return qb;
+    }
+
+    /**
+     *  对字典进行排序的Query构建
+     * @param qb
+     * @param orderBy 排序方式
+     */
+    protected addOrderByQuery(
+        qb: SelectQueryBuilder<DictionaryEntity>,
+        orderBy?: DictionaryOrderType,
+    ) {
+        switch (orderBy) {
+            case DictionaryOrderType.CREATED:
+                return qb.orderBy('dict.created_at', 'DESC');
+            case DictionaryOrderType.UPDATED:
+                return qb.orderBy('dict.updated_at', 'DESC');
+            default:
+                return qb.orderBy('dict.id', 'ASC');
+        }
     }
 }

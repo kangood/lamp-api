@@ -36,6 +36,7 @@
         "reflect-metadata": "^0.1.13",
         "rxjs": "^7.8.1",
         "sanitize-html": "^2.10.0",
+        "simple-flakeid": "^0.0.5",
         "typeorm": "^0.3.16"
     },
     "devDependencies": {

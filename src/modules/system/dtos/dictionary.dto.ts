@@ -1,33 +1,25 @@
 import { PartialType } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsDefined, IsNotEmpty, IsNumber, IsOptional, Min } from 'class-validator';
-
-import { toNumber } from 'lodash';
+import { IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 import { DtoValidation } from '@/modules/core/decorators';
 
-import { PaginateOptions } from '@/modules/database/types';
+import { ListWithTrashedQueryDto } from '@/modules/restful/dtos';
+import { DictionaryOrderType } from '@/modules/system/constants';
 
 /**
  * 字典分页查询验证
  */
 @DtoValidation({ type: 'query' })
-export class QueryDictionaryDto implements PaginateOptions {
-    @Transform(({ value }) => toNumber(value))
-    @Min(1, { message: '当前页必须大于1' })
-    @IsNumber()
+export class QueryDictionaryDto extends ListWithTrashedQueryDto {
+    @IsEnum(DictionaryOrderType, {
+        message: `排序规则必须是${Object.values(DictionaryOrderType).join(',')}其中一项`,
+    })
     @IsOptional()
-    page = 1;
-
-    @Transform(({ value }) => toNumber(value))
-    @Min(1, { message: '每页显示数据必须大于1' })
-    @IsNumber()
-    @IsOptional()
-    limit = 10;
+    orderBy?: DictionaryOrderType;
 }
 
 /**
- * 文章创建验证
+ * 字典创建验证
  */
 @DtoValidation({ groups: ['create'] })
 export class CreateDictionaryDto {
@@ -49,7 +41,7 @@ export class CreateDictionaryDto {
 }
 
 /**
- * 文章更新验证
+ * 字典更新验证
  */
 @DtoValidation({ groups: ['update'] })
 export class UpdateDictionaryDto extends PartialType(CreateDictionaryDto) {

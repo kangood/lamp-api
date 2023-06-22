@@ -5,26 +5,15 @@ import {
     Entity,
     UpdateDateColumn,
     Index,
-    PrimaryColumn,
-    Generated,
+    DeleteDateColumn,
 } from 'typeorm';
+
+import { BaseEntity } from '@/modules/database/base';
 
 @Exclude()
 @Index('uk_type_code', ['tenantCode', 'type', 'code'], { unique: true })
 @Entity('c_dictionary', { schema: 'lamp_generator' })
-export class DictionaryEntity {
-    @Expose()
-    @Generated()
-    @PrimaryColumn('bigint', {
-        name: 'id',
-        comment: 'ID',
-        transformer: {
-            to: (value) => value,
-            from: (value) => parseInt(value, 10),
-        },
-    })
-    id: number;
-
+export class DictionaryEntity extends BaseEntity {
     @Expose()
     @Column('varchar', { name: 'type', comment: '类型', length: 255 })
     type: string;
@@ -114,21 +103,25 @@ export class DictionaryEntity {
 
     @Expose()
     @CreateDateColumn({
-        name: 'create_at',
+        name: 'created_at',
         nullable: true,
         comment: '创建时间',
     })
-    createAt: Date | null;
+    createdAt: Date | null;
 
     @Expose()
     @UpdateDateColumn({
-        name: 'update_at',
+        name: 'updated_at',
         nullable: true,
         comment: '更新时间',
     })
-    updateAt: Date | null;
+    updatedAt: Date | null;
 
     @Expose()
     @Column('varchar', { name: 'tenant_code', comment: '租户编码', length: 20 })
     tenantCode: string;
+
+    @Expose()
+    @DeleteDateColumn({ name: 'deleted_at', comment: '删除时间', nullable: true })
+    deletedAt: Date | null;
 }
