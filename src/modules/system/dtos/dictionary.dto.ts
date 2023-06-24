@@ -16,6 +16,18 @@ export class QueryDictionaryDto extends ListWithTrashedQueryDto {
     })
     @IsOptional()
     orderBy?: DictionaryOrderType;
+
+    @IsOptional()
+    label?: string;
+
+    @IsOptional()
+    type?: string;
+
+    @IsOptional()
+    code?: string;
+
+    @IsOptional()
+    name?: string;
 }
 
 /**

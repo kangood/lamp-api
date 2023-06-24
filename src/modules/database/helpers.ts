@@ -1,5 +1,12 @@
 import { isNil } from 'lodash';
-import { DataSource, ObjectLiteral, ObjectType, Repository, SelectQueryBuilder } from 'typeorm';
+import {
+    DataSource,
+    EntityManager,
+    ObjectLiteral,
+    ObjectType,
+    Repository,
+    SelectQueryBuilder,
+} from 'typeorm';
 
 import { CUSTOM_REPOSITORY_METADATA } from '@/modules/database/constants';
 
@@ -14,12 +21,44 @@ export const paginate = async <E extends ObjectLiteral>(
     queryBuilder: SelectQueryBuilder<E>,
     options: PaginateOptions,
 ): Promise<PaginateReturn<E>> => {
+    // 查询数据总条数
+    const totalItems = await queryBuilder.getCount();
+    // 调用分页处理的公共函数
+    return extractedPaginate(options, queryBuilder, totalItems);
+};
+
+/**
+ * 按类型分组的分页函数
+ * @param manager Entity管理器，用于写原生SQL语句
+ * @param queryBuilder
+ * @param options 分页选项
+ */
+export const paginateType = async <E extends ObjectLiteral>(
+    manager: EntityManager,
+    queryBuilder: SelectQueryBuilder<E>,
+    options: PaginateOptions,
+): Promise<PaginateReturn<E>> => {
+    // 查询数据总条数（因为「select count(1) from (select * from) t」语句在TypeORM中不好弄，所以改成了拼接的方式）
+    const newVar: [{ count: number }] = await manager.query(
+        `select count(1) as count from (${queryBuilder.getQuery()})t`,
+    );
+    const totalItems = newVar[0].count;
+    // 调用分页处理的公共函数
+    return extractedPaginate(options, queryBuilder, totalItems);
+};
+
+/**
+ * 抽取分页处理的公共代码
+ */
+async function extractedPaginate<E>(
+    options: PaginateOptions,
+    queryBuilder: SelectQueryBuilder<E>,
+    totalItems: number,
+) {
     // 计算take和skip的值，并查询分页数据
     const start = options.page > 0 ? options.page - 1 : 0;
     queryBuilder.take(options.limit).skip(start * options.limit);
     const items = await queryBuilder.getMany();
-    // 查询数据总条数
-    const totalItems = await queryBuilder.getCount();
     // 计算总页数
     const totalPages = Math.ceil(totalItems / options.limit);
     // 计算当前页项目数量
@@ -35,7 +74,7 @@ export const paginate = async <E extends ObjectLiteral>(
             currentPage: options.page,
         },
     };
-};
+}
 
 /**
  * 为查询添加排序,默认排序规则为DESC

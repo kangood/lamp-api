@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Query, SerializeOptions } from '@nestjs/common';
 
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
@@ -20,5 +20,11 @@ import { DictionaryService } from '../services';
 export class DictionaryController extends BaseController<DictionaryService> {
     constructor(protected service: DictionaryService) {
         super(service);
+    }
+
+    @Get('listType')
+    @SerializeOptions({ groups: ['dict-list'] })
+    listType(@Query() dto: QueryDictionaryDto) {
+        return this.service.paginateType(dto);
     }
 }

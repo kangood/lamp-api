@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { omit } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 
 import { SelectQueryBuilder } from 'typeorm';
 
 import { BaseService } from '@/modules/database/base';
 
+import { paginateType } from '@/modules/database/helpers';
 import { QueryHook } from '@/modules/database/types';
 import { DictionaryOrderType } from '@/modules/system/constants';
 import { getSnowflakeId } from '@/modules/system/helpers';
@@ -53,6 +54,44 @@ export class DictionaryService extends BaseService<
     }
 
     /**
+     * 获取分页数据
+     * @param options 分页选项
+     * @param callback 回调查询
+     */
+    async paginateType(options?: QueryDictionaryDto, callback?: QueryHook<DictionaryEntity>) {
+        const qb = await this.buildListTypeQB(this.repository.buildBaseQB(), options, callback);
+        // 调用按类型分组的分页函数
+        return paginateType(this.repository.manager, qb, options);
+    }
+
+    /**
+     * 构建文章列表查询器
+     * @param queryBuilder 初始查询构造器
+     * @param options 排查分页选项后的查询选项
+     * @param callback 添加额外的查询
+     */
+    protected async buildListTypeQB(
+        queryBuilder: SelectQueryBuilder<DictionaryEntity>,
+        options: FindParams,
+        callback?: QueryHook<DictionaryEntity>,
+    ) {
+        const { orderBy, label } = options;
+        const queryName = this.repository.qbName;
+        const qb = await super.buildListQB(queryBuilder, options, callback);
+        // 根据输入文字模糊查询
+        if (!isEmpty(label)) {
+            qb.where(
+                `${queryName}.type like '%${label}%' or ${queryName}.label like '%${label}%' or ${queryName}.name like '%${label}%'`,
+            );
+        }
+        // 分组
+        qb.groupBy('type,label');
+        // 排序
+        this.addOrderByQuery(qb, orderBy);
+        return qb;
+    }
+
+    /**
      * 构建文章列表查询器
      * @param queryBuilder 初始查询构造器
      * @param options 排查分页选项后的查询选项
@@ -63,8 +102,21 @@ export class DictionaryService extends BaseService<
         options: FindParams,
         callback?: QueryHook<DictionaryEntity>,
     ) {
-        const { orderBy } = options;
+        // 调用父类通用qb处理方法
         const qb = await super.buildListQB(queryBuilder, options, callback);
+        // 子类自我实现
+        const { orderBy, type, code, name } = options;
+        const queryName = this.repository.qbName;
+        // 对几个可选参数的where判断
+        if (!isEmpty(type)) {
+            qb.andWhere({ type });
+        }
+        if (!isEmpty(code)) {
+            qb.andWhere(`${queryName}.code like '%${code}%'`);
+        }
+        if (!isEmpty(name)) {
+            qb.andWhere(`${queryName}.name like '%${name}%'`);
+        }
         this.addOrderByQuery(qb, orderBy);
         return qb;
     }
@@ -78,13 +130,14 @@ export class DictionaryService extends BaseService<
         qb: SelectQueryBuilder<DictionaryEntity>,
         orderBy?: DictionaryOrderType,
     ) {
+        const queryName = this.repository.qbName;
         switch (orderBy) {
             case DictionaryOrderType.CREATED:
-                return qb.orderBy('dict.created_at', 'DESC');
+                return qb.orderBy(`${queryName}.created_at`, 'DESC');
             case DictionaryOrderType.UPDATED:
-                return qb.orderBy('dict.updated_at', 'DESC');
+                return qb.orderBy(`${queryName}.updated_at`, 'DESC');
             default:
-                return qb.orderBy('dict.id', 'ASC');
+                return qb.orderBy(`${queryName}.id`, 'ASC');
         }
     }
 }
