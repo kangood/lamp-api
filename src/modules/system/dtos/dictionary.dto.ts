@@ -4,18 +4,18 @@ import { IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-valid
 import { DtoValidation } from '@/modules/core/decorators';
 
 import { ListWithTrashedQueryDto } from '@/modules/restful/dtos';
-import { DictionaryOrderType } from '@/modules/system/constants';
+import { PublicOrderType } from '@/modules/system/constants';
 
 /**
  * 字典分页查询验证
  */
 @DtoValidation({ type: 'query' })
 export class QueryDictionaryDto extends ListWithTrashedQueryDto {
-    @IsEnum(DictionaryOrderType, {
-        message: `排序规则必须是${Object.values(DictionaryOrderType).join(',')}其中一项`,
+    @IsEnum(PublicOrderType, {
+        message: `排序规则必须是${Object.values(PublicOrderType).join(',')}其中一项`,
     })
     @IsOptional()
-    orderBy?: DictionaryOrderType;
+    orderBy?: PublicOrderType;
 
     @IsOptional()
     label?: string;
@@ -47,8 +47,7 @@ export class CreateDictionaryDto {
     @IsOptional({ groups: ['update'] })
     code!: string;
 
-    @IsNotEmpty({ groups: ['create'], message: '名称必须填写' })
-    @IsOptional({ groups: ['update'] })
+    @IsNotEmpty({ groups: ['create', 'update'], message: '名称必须填写' })
     name!: string;
 }
 

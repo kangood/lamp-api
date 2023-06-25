@@ -1,12 +1,15 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { isNil } from 'lodash';
-import { In, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
+import { ForbiddenException, NotFoundException } from "@nestjs/common";
+import { isNil } from "lodash";
+import { In, ObjectLiteral, SelectQueryBuilder } from "typeorm";
 
-import { SelectTrashMode } from '../constants';
-import { paginate } from '../helpers';
-import { QueryHook, ServiceListQueryOption, PaginateReturn, PaginateOptions } from '../types';
+import { getSnowflakeId } from "@/modules/system/helpers";
 
-import { BaseRepository } from './repository';
+import { SelectTrashMode } from "../constants";
+import { paginate } from "../helpers";
+import { PaginateOptions, PaginateReturn, QueryHook, ServiceListQueryOption } from "../types";
+
+import { BaseRepository } from "./repository";
+
 /**
  *  CRUD操作服务
  */
@@ -68,16 +71,20 @@ export abstract class BaseService<
     }
 
     /**
-     * 创建数据,如果子类没有实现则抛出404
+     * 新建数据，由子类去实现具体插入操作
      * @param data 请求数据
      * @param others 其它参数
      */
     create(data: any, ...others: any[]): Promise<E> {
-        throw new ForbiddenException(`Can not to create ${this.repository.qbName}!`);
+        return {
+            ...data,
+            id: getSnowflakeId(),
+            createdAt: new Date(),
+        };
     }
 
     /**
-     * 更新数据,如果子类没有实现则抛出404
+     * 更新数据，如果子类没有实现则抛出404
      * @param data 请求数据
      * @param others 其它参数
      */
@@ -123,12 +130,7 @@ export abstract class BaseService<
         const trasheds = items.filter((item) => !isNil(item));
         if (trasheds.length < 0) return [];
         await this.repository.restore(trasheds.map((item) => item.id));
-        const qb = await this.buildListQB(
-            this.repository.buildBaseQB(),
-            undefined,
-            async (builder) => builder.andWhereInIds(trasheds),
-        );
-        return qb.getMany();
+        return items;
     }
 
     /**

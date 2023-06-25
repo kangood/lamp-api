@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { isEmpty, omit } from 'lodash';
 
 import { SelectQueryBuilder } from 'typeorm';
@@ -7,8 +7,7 @@ import { BaseService } from '@/modules/database/base';
 
 import { paginateType } from '@/modules/database/helpers';
 import { QueryHook } from '@/modules/database/types';
-import { DictionaryOrderType } from '@/modules/system/constants';
-import { getSnowflakeId } from '@/modules/system/helpers';
+import { PublicOrderType } from '@/modules/system/constants';
 
 import { CreateDictionaryDto, QueryDictionaryDto, UpdateDictionaryDto } from '../dtos';
 import { DictionaryEntity } from '../entities';
@@ -37,11 +36,17 @@ export class DictionaryService extends BaseService<
      * @param data
      */
     async create(data: CreateDictionaryDto) {
-        const createDictionaryDto = {
-            ...data,
-            id: getSnowflakeId(),
-        };
-        return this.repository.save(createDictionaryDto);
+        const createParams = await super.create(data);
+        // 先判断字典编码是否重复
+        const qb = await super.buildListQB(this.repository.buildBaseQB(), createParams);
+        const count = await qb
+            .where({ type: createParams.type, code: createParams.code })
+            .getCount();
+        if (count > 0) {
+            throw new NotAcceptableException(`dictionary code [${createParams.code}] is repeated`);
+        }
+        // 判断后再执行插入
+        return this.repository.save(createParams);
     }
 
     /**
@@ -122,20 +127,19 @@ export class DictionaryService extends BaseService<
     }
 
     /**
-     *  对字典进行排序的Query构建
+     * 对字典进行排序的Query构建
      * @param qb
      * @param orderBy 排序方式
      */
-    protected addOrderByQuery(
-        qb: SelectQueryBuilder<DictionaryEntity>,
-        orderBy?: DictionaryOrderType,
-    ) {
+    protected addOrderByQuery(qb: SelectQueryBuilder<DictionaryEntity>, orderBy?: PublicOrderType) {
         const queryName = this.repository.qbName;
         switch (orderBy) {
-            case DictionaryOrderType.CREATED:
+            // 按时间倒序
+            case PublicOrderType.CREATED:
                 return qb.orderBy(`${queryName}.created_at`, 'DESC');
-            case DictionaryOrderType.UPDATED:
+            case PublicOrderType.UPDATED:
                 return qb.orderBy(`${queryName}.updated_at`, 'DESC');
+            // 默认按id正序
             default:
                 return qb.orderBy(`${queryName}.id`, 'ASC');
         }
