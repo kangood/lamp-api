@@ -11,7 +11,7 @@ import {
 import { BaseEntity } from '@/modules/database/base';
 
 @Exclude()
-@Index('uk_type_code', ['tenantCode', 'type', 'code'], { unique: true })
+@Index('uk_type_code', ['type', 'code'], { unique: true })
 @Entity('c_dictionary', { schema: 'lamp_generator' })
 export class DictionaryEntity extends BaseEntity {
     @Expose()
@@ -116,10 +116,6 @@ export class DictionaryEntity extends BaseEntity {
         comment: '更新时间',
     })
     updatedAt: Date | null;
-
-    @Expose()
-    @Column('varchar', { name: 'tenant_code', comment: '租户编码', length: 20 })
-    tenantCode: string;
 
     @Expose()
     @DeleteDateColumn({ name: 'deleted_at', comment: '删除时间', nullable: true })

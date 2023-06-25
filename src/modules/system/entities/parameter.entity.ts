@@ -10,7 +10,6 @@ import {
 import { BaseEntity } from '@/modules/database/base';
 
 @Index('uk_key', ['key'], { unique: true })
-@Index('uk_param_key', ['tenantCode', 'key'], { unique: true })
 @Entity('c_parameter', { schema: 'lamp_generator' })
 export class ParameterEntity extends BaseEntity {
     @Column('varchar', {
@@ -70,9 +69,6 @@ export class ParameterEntity extends BaseEntity {
         comment: '更新时间',
     })
     updatedAt: Date | null;
-
-    @Column('varchar', { name: 'tenant_code', comment: '租户编码', length: 20 })
-    tenantCode: string;
 
     @DeleteDateColumn({ name: 'deleted_at', comment: '删除时间', nullable: true })
     deletedAt: Date | null;

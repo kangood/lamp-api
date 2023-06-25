@@ -76,10 +76,12 @@ export abstract class BaseService<
      * @param others 其它参数
      */
     create(data: any, ...others: any[]): Promise<E> {
+        const currentDate = new Date();
         return {
             ...data,
             id: getSnowflakeId(),
-            createdAt: new Date(),
+            createdAt: currentDate,
+            updatedAt: currentDate,
         };
     }
 
