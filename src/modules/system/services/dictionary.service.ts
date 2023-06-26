@@ -122,6 +122,7 @@ export class DictionaryService extends BaseService<
         if (!isEmpty(name)) {
             qb.andWhere(`${queryName}.name like '%${name}%'`);
         }
+        // 排序
         this.addOrderByQuery(qb, orderBy);
         return qb;
     }

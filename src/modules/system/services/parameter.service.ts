@@ -84,6 +84,7 @@ export class ParameterService extends BaseService<
         if (!isNil(timeRange)) {
             qb.andWhere(`${queryName}.created_at between ${timeRange[0]} and ${timeRange[1]}`);
         }
+        // 排序
         this.addOrderByQuery(qb, orderBy);
         return qb;
     }

@@ -95,11 +95,11 @@ export class DictionaryEntity extends BaseEntity {
 
     @Expose()
     @Column('bigint', { name: 'created_by', nullable: true, comment: '创建人id' })
-    createdBy: string | null;
+    createdBy: number | null;
 
     @Expose()
     @Column('bigint', { name: 'updated_by', nullable: true, comment: '更新人id' })
-    updatedBy: string | null;
+    updatedBy: number | null;
 
     @Expose()
     @CreateDateColumn({

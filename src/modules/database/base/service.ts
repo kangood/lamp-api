@@ -1,14 +1,14 @@
-import { ForbiddenException, NotFoundException } from "@nestjs/common";
-import { isNil } from "lodash";
-import { In, ObjectLiteral, SelectQueryBuilder } from "typeorm";
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { isNil } from 'lodash';
+import { In, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 
-import { getSnowflakeId } from "@/modules/system/helpers";
+import { getSnowflakeId } from '@/modules/system/helpers';
 
-import { SelectTrashMode } from "../constants";
-import { paginate } from "../helpers";
-import { PaginateOptions, PaginateReturn, QueryHook, ServiceListQueryOption } from "../types";
+import { SelectTrashMode } from '../constants';
+import { paginate } from '../helpers';
+import { PaginateOptions, PaginateReturn, QueryHook, ServiceListQueryOption } from '../types';
 
-import { BaseRepository } from "./repository";
+import { BaseRepository } from './repository';
 
 /**
  *  CRUD操作服务
@@ -26,7 +26,7 @@ export abstract class BaseService<
     /**
      * 是否开启软删除功能
      */
-    protected enableTrash = true;
+    protected enableTrash = false;
 
     constructor(repository: R) {
         this.repository = repository;

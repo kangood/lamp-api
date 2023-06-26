@@ -51,10 +51,10 @@ export class ParameterEntity extends BaseEntity {
     readonly: boolean | null;
 
     @Column('bigint', { name: 'created_by', nullable: true, comment: '创建人id' })
-    createdBy: string | null;
+    createdBy: number | null;
 
     @Column('bigint', { name: 'updated_by', nullable: true, comment: '更新人id' })
-    updatedBy: string | null;
+    updatedBy: number | null;
 
     @CreateDateColumn({
         name: 'created_at',

@@ -8,7 +8,7 @@ import { ListWithTrashedQueryDto } from '@/modules/restful/dtos';
 import { PublicOrderType } from '@/modules/system/constants';
 
 /**
- * 字典分页查询验证
+ * 系统参数分页查询验证
  */
 @DtoValidation({ type: 'query' })
 export class QueryParameterDto extends ListWithTrashedQueryDto {
@@ -33,7 +33,7 @@ export class QueryParameterDto extends ListWithTrashedQueryDto {
 }
 
 /**
- * 字典创建验证
+ * 系统参数创建验证
  */
 @DtoValidation({ groups: ['create'] })
 export class CreateParameterDto {
@@ -58,7 +58,7 @@ export class CreateParameterDto {
 }
 
 /**
- * 字典更新验证
+ * 系统参数更新验证
  */
 @DtoValidation({ groups: ['update'] })
 export class UpdateParameterDto extends PartialType(CreateParameterDto) {
