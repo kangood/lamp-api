@@ -38,9 +38,9 @@ export class ParameterService extends BaseService<
         const createParams = await super.create(data);
         // 先判断参数键是否重复
         const qb = await super.buildListQB(this.repository.buildBaseQB(), createParams);
-        const count = await qb.where({ key: data.key }).getCount();
+        const count = await qb.where({ key: createParams.key }).getCount();
         if (count > 0) {
-            throw new NotAcceptableException(`parameter key [${data.key}] is repeated`);
+            throw new NotAcceptableException(`parameter key [${createParams.key}] is repeated`);
         }
         // 判断后再执行插入
         return this.repository.save(createParams);

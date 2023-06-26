@@ -1,48 +1,81 @@
-import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import {
+    IsDefined,
+    IsEnum,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    Min,
+    ValidateIf,
+} from 'class-validator';
+
+import { toNumber } from 'lodash';
 
 import { DtoValidation } from '@/modules/core/decorators';
-
-import { ListWithTrashedQueryDto } from '@/modules/restful/dtos';
-import { PublicOrderType } from '@/modules/system/constants';
+import { SelectTrashMode } from '@/modules/database/constants';
+import { IsDataExist, IsTreeUnique, IsTreeUniqueExist } from '@/modules/database/constraints';
+import { AreaEntity } from '@/modules/system/entities';
 
 /**
  * 地区分页查询验证
  */
 @DtoValidation({ type: 'query' })
-export class QueryAreaDto extends ListWithTrashedQueryDto {
-    @IsEnum(PublicOrderType, {
-        message: `排序规则必须是${Object.values(PublicOrderType).join(',')}其中一项`,
-    })
+export class QueryAreaTreeDto {
+    @IsEnum(SelectTrashMode)
     @IsOptional()
-    orderBy?: PublicOrderType;
-
-    @IsOptional()
-    parentId?: number;
+    trashed?: SelectTrashMode;
 }
 
 /**
  * 地区创建验证
  */
-@DtoValidation()
+@DtoValidation({ groups: ['create'] })
 export class CreateAreaDto {
-    @IsNotEmpty({ message: '编码不能为空' })
-    code: string;
+    @IsTreeUnique(AreaEntity, {
+        groups: ['create'],
+        message: '地区编码重复',
+    })
+    @IsTreeUniqueExist(AreaEntity, {
+        groups: ['update'],
+        message: '地区编码重复',
+    })
+    @IsNotEmpty({ groups: ['create'], message: '地区编码不能为空' })
+    @IsOptional({ groups: ['update'] })
+    code!: string;
 
-    @IsNotEmpty({ message: '名称不能为空' })
+    @IsDataExist(AreaEntity, { always: true, message: '父地区不存在' })
+    @IsNumber(undefined, { always: true, message: '父地区ID格式不正确' })
+    @ValidateIf((value) => value.parent !== null && value.parent)
+    @IsOptional({ always: true })
+    parent?: number;
+
+    @Transform(({ value }) => toNumber(value))
+    @Min(0, { always: true, message: '排序值必须大于0' })
+    @IsNumber(undefined, { always: true })
+    @IsOptional({ always: true })
+    sortValue = 0;
+
+    @IsNotEmpty({ groups: ['create'], message: '地区名称不能为空' })
+    @IsOptional({ groups: ['update'] })
     label: string;
 
     @IsOptional()
     fullName: string | null;
 
     @IsOptional()
-    sortValue: number | null;
-
-    @IsOptional()
     level: string | null;
 
     @IsOptional()
     source: string | null;
+}
 
-    @IsNotEmpty({ message: '父节点ID必须传递' })
-    parentId: number | null;
+/**
+ * 地区更新验证
+ */
+@DtoValidation({ groups: ['update'] })
+export class UpdateAreaDto extends PartialType(CreateAreaDto) {
+    @IsNumber(undefined, { groups: ['update'], message: '分类ID格式错误' })
+    @IsDefined({ groups: ['update'], message: '分类ID必须指定' })
+    id!: number;
 }

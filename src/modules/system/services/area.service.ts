@@ -1,28 +1,37 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { SelectQueryBuilder } from 'typeorm';
+import { isNil, omit } from 'lodash';
+import { SelectQueryBuilder, EntityNotFoundError } from 'typeorm';
 
 import { BaseService } from '@/modules/database/base';
 
-import { QueryHook } from '@/modules/database/types';
+import { SelectTrashMode } from '@/modules/database/constants';
 import { PublicOrderType } from '@/modules/system/constants';
 
-import { QueryAreaDto, CreateAreaDto } from '../dtos';
+import { QueryAreaTreeDto, CreateAreaDto, UpdateAreaDto } from '../dtos';
 import { AreaEntity } from '../entities';
 import { AreaRepository } from '../repositories';
-
-// 地区查询接口
-type FindParams = {
-    [key in keyof Omit<QueryAreaDto, 'limit' | 'page'>]: QueryAreaDto[key];
-};
 
 /**
  * 地区数据操作
  */
 @Injectable()
-export class AreaService extends BaseService<AreaEntity, AreaRepository, FindParams> {
+export class AreaService extends BaseService<AreaEntity, AreaRepository> {
+    protected enableTrash = false;
+
     constructor(protected repository: AreaRepository) {
         super(repository);
+    }
+
+    /**
+     * 查询地区树
+     */
+    async findTrees(options: QueryAreaTreeDto) {
+        const { trashed = SelectTrashMode.NONE } = options;
+        return this.repository.findTrees({
+            withTrashed: trashed === SelectTrashMode.ALL || trashed === SelectTrashMode.ONLY,
+            onlyTrashed: trashed === SelectTrashMode.ONLY,
+        });
     }
 
     /**
@@ -31,35 +40,52 @@ export class AreaService extends BaseService<AreaEntity, AreaRepository, FindPar
      */
     async create(data: CreateAreaDto) {
         const createParams = await super.create(data);
-        // 先判断编码是否重复
-        const qb = await super.buildListQB(this.repository.buildBaseQB(), createParams);
-        const count = await qb.where({ code: data.code }).getCount();
-        if (count > 0) {
-            throw new NotAcceptableException(`Area code [${data.code}] is repeated`);
-        }
-        // 判断后再执行插入
-        return this.repository.save(createParams);
+        // 执行插入
+        return this.repository.save({
+            ...createParams,
+            // 传入父地区
+            parent: await this.getParent(undefined, data.parent),
+        });
     }
 
     /**
-     * 构建文章列表查询器
-     * @param queryBuilder 初始查询构造器
-     * @param options 排查分页选项后的查询选项
-     * @param callback 添加额外的查询
+     * 更新地区
+     * @param data
      */
-    protected async buildListQB(
-        queryBuilder: SelectQueryBuilder<AreaEntity>,
-        options: FindParams,
-        callback?: QueryHook<AreaEntity>,
-    ) {
-        // 调用父类通用qb处理方法
-        const qb = await super.buildListQB(queryBuilder, options, callback);
-        // 子类自我实现
-        const { orderBy } = options;
-        // ...
-        // 排序
-        this.addOrderByQuery(qb, orderBy);
-        return qb;
+    async update(data: UpdateAreaDto) {
+        const parent = await this.getParent(data.id, data.parent);
+        const querySet = omit(data, ['id', 'parent']);
+        if (Object.keys(querySet).length > 0) {
+            await this.repository.update(data.id, querySet);
+        }
+        const cat = await this.detail(data.id);
+        const shouldUpdateParent =
+            (!isNil(cat.parent) && !isNil(parent) && cat.parent.id !== parent.id) ||
+            (isNil(cat.parent) && !isNil(parent)) ||
+            (!isNil(cat.parent) && isNil(parent));
+        // 父分类单独更新
+        if (parent !== undefined && shouldUpdateParent) {
+            cat.parent = parent;
+            await this.repository.save(cat);
+        }
+        return cat;
+    }
+
+    /**
+     * 获取请求传入的父地区
+     * @param current 当前地区的ID
+     * @param id
+     */
+    protected async getParent(current?: number, id?: number) {
+        if (current === id) return undefined;
+        let parent: AreaEntity | undefined;
+        if (id !== undefined) {
+            if (id === null) return null;
+            parent = await this.repository.findOne({ where: { id } });
+            if (!parent)
+                throw new EntityNotFoundError(AreaEntity, `Parent category ${id} not exists!`);
+        }
+        return parent;
     }
 
     /**

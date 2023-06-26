@@ -2,10 +2,11 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { isNil } from 'lodash';
 import { In, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 
+import { BaseTreeRepository } from '@/modules/database/base/tree.repository';
 import { getSnowflakeId } from '@/modules/system/helpers';
 
-import { SelectTrashMode } from '../constants';
-import { paginate } from '../helpers';
+import { SelectTrashMode, TreeChildrenResolve } from '../constants';
+import { manualPaginate, paginate } from '../helpers';
 import { PaginateOptions, PaginateReturn, QueryHook, ServiceListQueryOption } from '../types';
 
 import { BaseRepository } from './repository';
@@ -15,7 +16,7 @@ import { BaseRepository } from './repository';
  */
 export abstract class BaseService<
     E extends ObjectLiteral,
-    R extends BaseRepository<E>,
+    R extends BaseRepository<E> | BaseTreeRepository<E>,
     P extends ServiceListQueryOption<E> = ServiceListQueryOption<E>,
 > {
     /**
@@ -26,12 +27,19 @@ export abstract class BaseService<
     /**
      * 是否开启软删除功能
      */
-    protected enableTrash = false;
+    protected enableTrash = true;
 
     constructor(repository: R) {
         this.repository = repository;
-        if (!(this.repository instanceof BaseRepository)) {
-            throw new Error('Repository must instance of BaseRepository in DataService!');
+        if (
+            !(
+                this.repository instanceof BaseRepository ||
+                this.repository instanceof BaseTreeRepository
+            )
+        ) {
+            throw new Error(
+                'Repository must instance of BaseRepository or BaseTreeRepository in DataService!',
+            );
         }
     }
 
@@ -41,6 +49,20 @@ export abstract class BaseService<
      * @param callback 回调查询
      */
     async list(options?: P, callback?: QueryHook<E>): Promise<E[]> {
+        const { trashed: isTrashed = false } = options ?? {};
+        const trashed = isTrashed || SelectTrashMode.NONE;
+        if (this.repository instanceof BaseTreeRepository) {
+            const withTrashed =
+                this.enableTrash &&
+                (trashed === SelectTrashMode.ALL || trashed === SelectTrashMode.ONLY);
+            const onlyTrashed = this.enableTrash && trashed === SelectTrashMode.ONLY;
+            const tree = await this.repository.findTrees({
+                ...options,
+                withTrashed,
+                onlyTrashed,
+            });
+            return this.repository.toFlatTrees(tree);
+        }
         const qb = await this.buildListQB(this.repository.buildBaseQB(), options, callback);
         return qb.getMany();
     }
@@ -54,7 +76,12 @@ export abstract class BaseService<
         options?: PaginateOptions & P,
         callback?: QueryHook<E>,
     ): Promise<PaginateReturn<E>> {
-        const qb = await this.buildListQB(this.repository.buildBaseQB(), options, callback);
+        const queryOptions = (options ?? {}) as P;
+        if (this.repository instanceof BaseTreeRepository) {
+            const data = await this.list(queryOptions, callback);
+            return manualPaginate(options, data) as PaginateReturn<E>;
+        }
+        const qb = await this.buildListQB(this.repository.buildBaseQB(), queryOptions, callback);
         return paginate(qb, options);
     }
 
@@ -100,10 +127,38 @@ export abstract class BaseService<
      * @param trash 是否只扔到回收站,如果为true则软删除
      */
     async delete(ids: number[], trash?: boolean) {
-        const items = await this.repository.find({
-            where: { id: In(ids) as any },
-            withDeleted: this.enableTrash ? true : undefined,
-        });
+        let items: E[] = [];
+        if (this.repository instanceof BaseTreeRepository) {
+            items = await this.repository.find({
+                where: { id: In(ids) as any },
+                withDeleted: this.enableTrash ? true : undefined,
+                relations: ['parent', 'children'],
+            });
+            if (this.repository.childrenResolve === TreeChildrenResolve.UP) {
+                for (const item of items) {
+                    if (isNil(item.children) || item.children.length <= 0) continue;
+                    const nchildren = [...item.children].map((c) => {
+                        c.parent = item.parent;
+                        return item;
+                    });
+                    await this.repository.save(nchildren);
+                }
+            } else if (this.repository.childrenResolve === TreeChildrenResolve.DELETE) {
+                // TODO: 这里需要使用递归把所有子节点都加到items里面去全部删除
+                for (const item of items) {
+                    if (!isNil(item.children) && item.children.length > 0) {
+                        for (const child of item.children) {
+                            items.push(child);
+                        }
+                    }
+                }
+            }
+        } else {
+            items = await this.repository.find({
+                where: { id: In(ids) as any },
+                withDeleted: this.enableTrash ? true : undefined,
+            });
+        }
         if (this.enableTrash && trash) {
             const directs = items.filter((item) => !isNil(item.deletedAt));
             const softs = items.filter((item) => isNil(item.deletedAt));
