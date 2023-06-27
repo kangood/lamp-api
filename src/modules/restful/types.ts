@@ -14,7 +14,7 @@ export interface CrudMethodOption {
      * 序列化选项,如果为`noGroup`则不传参数，否则根据`id`+方法匹配来传参
      */
     serialize?: ClassTransformOptions | 'noGroup';
-    hook?: (target: Type<any>, method: string) => void;
+    hook?: (target: Type, method: string) => void;
 }
 /**
  * 每个启用方法的配置
@@ -33,6 +33,6 @@ export interface CrudOptions {
     enabled: Array<CrudMethod | CrudItem>;
     // 一些方法要使用到的自定义DTO
     dtos: {
-        [key in 'list' | 'store' | 'update']?: Type<any>;
+        [key in 'list' | 'store' | 'update']?: Type;
     };
 }

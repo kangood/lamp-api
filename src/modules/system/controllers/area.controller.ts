@@ -3,7 +3,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
-import { CreateAreaDto, QueryAreaTreeDto } from '../dtos';
+import { CreateAreaDto, QueryAreaTreeDto, UpdateAreaDto } from '../dtos';
 
 import { AreaService } from '../services';
 
@@ -12,6 +12,8 @@ import { AreaService } from '../services';
     enabled: ['list', 'detail', 'store', 'update', 'delete', 'restore'],
     dtos: {
         store: CreateAreaDto,
+        update: UpdateAreaDto,
+        list: QueryAreaTreeDto,
     },
 })
 @Controller('area')

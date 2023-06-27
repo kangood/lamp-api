@@ -15,38 +15,40 @@ import { toNumber } from 'lodash';
 import { DtoValidation } from '@/modules/core/decorators';
 import { SelectTrashMode } from '@/modules/database/constants';
 import { IsDataExist, IsTreeUnique, IsTreeUniqueExist } from '@/modules/database/constraints';
+
 import { ListQueryDto } from '@/modules/restful/dtos';
-import { AreaEntity } from '@/modules/system/entities';
+
+import { OrgEntity } from '../entities';
 
 /**
- * 地区分页查询验证
+ * 机构分页查询验证
  */
 @DtoValidation({ type: 'query' })
-export class QueryAreaTreeDto extends ListQueryDto {
+export class QueryOrgTreeDto extends ListQueryDto {
     @IsEnum(SelectTrashMode)
     @IsOptional()
     trashed?: SelectTrashMode;
 }
 
 /**
- * 地区创建验证
+ * 机构创建验证
  */
 @DtoValidation({ groups: ['create'] })
-export class CreateAreaDto {
-    @IsTreeUnique(AreaEntity, {
+export class CreateOrgDto {
+    @IsTreeUnique(OrgEntity, {
         groups: ['create'],
-        message: '地区编码重复',
+        message: '该机构/部门已经存在',
     })
-    @IsTreeUniqueExist(AreaEntity, {
+    @IsTreeUniqueExist(OrgEntity, {
         groups: ['update'],
-        message: '地区编码重复',
+        message: '该机构/部门已经存在',
     })
-    @IsNotEmpty({ groups: ['create'], message: '地区编码不能为空' })
+    @IsNotEmpty({ groups: ['create'], message: '机构/部门名称不能为空' })
     @IsOptional({ groups: ['update'] })
-    code!: string;
+    label!: string;
 
-    @IsDataExist(AreaEntity, { always: true, message: '父地区不存在' })
-    @IsNumber(undefined, { always: true, message: '父地区ID格式不正确' })
+    @IsDataExist(OrgEntity, { always: true, message: '父机构/部门不存在' })
+    @IsNumber(undefined, { always: true, message: '父机构/部门ID格式不正确' })
     @ValidateIf((value) => value.parent !== null && value.parent)
     @IsOptional({ always: true })
     parent?: number;
@@ -57,26 +59,25 @@ export class CreateAreaDto {
     @IsOptional({ always: true })
     sortValue = 1;
 
-    @IsNotEmpty({ groups: ['create'], message: '地区名称不能为空' })
-    @IsOptional({ groups: ['update'] })
-    label: string;
+    @IsOptional()
+    abbreviation: string | null;
 
     @IsOptional()
-    fullName: string | null;
+    type: string | null;
 
     @IsOptional()
-    level: string | null;
+    describe: string | null;
 
     @IsOptional()
-    source: string | null;
+    state: boolean | null;
 }
 
 /**
- * 地区更新验证
+ * 机构更新验证
  */
 @DtoValidation({ groups: ['update'] })
-export class UpdateAreaDto extends PartialType(CreateAreaDto) {
-    @IsNumber(undefined, { groups: ['update'], message: '地区ID格式错误' })
-    @IsDefined({ groups: ['update'], message: '地区ID必须指定' })
+export class UpdateOrgDto extends PartialType(CreateOrgDto) {
+    @IsNumber(undefined, { groups: ['update'], message: '机构ID格式错误' })
+    @IsDefined({ groups: ['update'], message: '机构ID必须指定' })
     id!: number;
 }
