@@ -11,6 +11,8 @@ ALTER TABLE `c_area`
     ADD COLUMN `mpath` varchar(255) DEFAULT '' COMMENT '物化路径' AFTER `parent_id`;
 ALTER TABLE `c_org`
     ADD COLUMN `deleted_at` datetime(0) NULL COMMENT '删除时间' AFTER `describe_`;
+ALTER TABLE `lamp_nestjs`.`c_station`
+    ADD COLUMN `deleted_at` datetime NULL COMMENT '删除时间' AFTER `describe_`;
 
 -- 修改字段
 ALTER TABLE `c_dictionary`
@@ -38,6 +40,10 @@ ALTER TABLE `c_org`
     CHANGE COLUMN `parent_id` `parentId` bigint(20) NULL DEFAULT NULL COMMENT '父ID' AFTER `abbreviation`;
 ALTER TABLE `c_org`
     CHANGE COLUMN `tree_path` `mpath` varchar(255) NULL DEFAULT '' COMMENT '树结构' AFTER `parentId`;
+ALTER TABLE `lamp_nestjs`.`c_station`
+    CHANGE COLUMN `create_time` `created_at` datetime NULL DEFAULT NULL COMMENT '创建时间' AFTER `describe_`,
+    CHANGE COLUMN `update_time` `updated_at` datetime NULL DEFAULT NULL COMMENT '修改时间' AFTER `created_by`,
+    MODIFY COLUMN `org_id` bigint(20) NULL DEFAULT NULL COMMENT '组织' AFTER `name`;
 
 -- 修改索引
 ALTER TABLE `c_org` DROP INDEX `fu_path`, ADD FULLTEXT INDEX `fu_path`(`mpath`);

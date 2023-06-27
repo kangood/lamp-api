@@ -39,6 +39,7 @@ export class AreaService extends BaseService<AreaEntity, AreaRepository> {
      * @param data
      */
     async create(data: CreateAreaDto) {
+        // 获取通用参数
         const createParams = await super.create(data);
         // 执行插入
         return this.repository.save({

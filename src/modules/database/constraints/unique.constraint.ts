@@ -46,6 +46,7 @@ export class UniqueConstraint implements ValidatorConstraintInterface {
             );
         } catch (err) {
             // 如果数据库操作异常则验证失败
+            console.log(`UniqueConstraint failed, err=${err}`);
             return false;
         }
     }

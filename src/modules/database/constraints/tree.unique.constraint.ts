@@ -55,7 +55,7 @@ export class UniqueTreeConstraint implements ValidatorConstraintInterface {
             // 对比每个子分类的queryProperty值是否与当前验证的dto属性相同,如果有相同的则验证失败
             return collection.every((item) => item[condition.property] !== value);
         } catch (err) {
-            console.log(err);
+            console.log(`UniqueTreeConstraint failed, err=${err}`);
             return false;
         }
     }
