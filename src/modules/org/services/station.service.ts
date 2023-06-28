@@ -12,13 +12,13 @@ import { PublicOrderType } from '@/modules/system/constants';
 import { CreateStationDto, QueryStationDto, UpdateStationDto } from '../dtos';
 import { OrgEntity, StationEntity } from '../entities';
 import { StationRepository } from '../repositories';
-// 字典查询接口
+// 岗位查询接口
 type FindParams = {
     [key in keyof Omit<QueryStationDto, 'limit' | 'page'>]: QueryStationDto[key];
 };
 
 /**
- * 字典数据操作
+ * 岗位数据操作
  */
 @Injectable()
 export class StationService extends BaseService<StationEntity, StationRepository, FindParams> {
@@ -27,7 +27,7 @@ export class StationService extends BaseService<StationEntity, StationRepository
     }
 
     /**
-     * 新建字典值
+     * 新建岗位
      * @param data
      */
     async create(data: CreateStationDto) {
@@ -38,7 +38,7 @@ export class StationService extends BaseService<StationEntity, StationRepository
     }
 
     /**
-     * 更新字典值
+     * 更新岗位
      * @param data
      */
     async update(data: UpdateStationDto) {
@@ -47,7 +47,7 @@ export class StationService extends BaseService<StationEntity, StationRepository
     }
 
     /**
-     * 关联机构查询
+     * 调用关联查询并分页
      */
     async listRelate(
         options?: QueryStationDto,
@@ -58,14 +58,14 @@ export class StationService extends BaseService<StationEntity, StationRepository
     }
 
     /**
-     * 构建岗位列表查询器
+     * 加入关联机构查询
      */
     protected async buildListRelateQB(
         queryBuilder: SelectQueryBuilder<StationEntity>,
         options: FindParams,
         callback?: QueryHook<StationEntity>,
     ) {
-        // 调用buildListQB组装条件查询，再次基础上加入对org的关联
+        // 调用buildListQB组装条件查询，再此基础上加入对org的关联
         return (await this.buildListQB(queryBuilder, options, callback)).leftJoinAndMapOne(
             `station.orgMap`,
             OrgEntity,
@@ -106,7 +106,7 @@ export class StationService extends BaseService<StationEntity, StationRepository
     }
 
     /**
-     * 对字典进行排序的Query构建
+     * 对岗位进行排序的Query构建
      * @param qb
      * @param orderBy 排序方式
      */

@@ -11,8 +11,10 @@ ALTER TABLE `c_area`
     ADD COLUMN `mpath` varchar(255) DEFAULT '' COMMENT '物化路径' AFTER `parent_id`;
 ALTER TABLE `c_org`
     ADD COLUMN `deleted_at` datetime(0) NULL COMMENT '删除时间' AFTER `describe_`;
-ALTER TABLE `lamp_nestjs`.`c_station`
+ALTER TABLE `c_station`
     ADD COLUMN `deleted_at` datetime NULL COMMENT '删除时间' AFTER `describe_`;
+ALTER TABLE `c_user`
+    ADD COLUMN `deleted_at` datetime NULL COMMENT '删除时间' AFTER `last_login_time`;
 
 -- 修改字段
 ALTER TABLE `c_dictionary`
@@ -40,10 +42,18 @@ ALTER TABLE `c_org`
     CHANGE COLUMN `parent_id` `parentId` bigint(20) NULL DEFAULT NULL COMMENT '父ID' AFTER `abbreviation`;
 ALTER TABLE `c_org`
     CHANGE COLUMN `tree_path` `mpath` varchar(255) NULL DEFAULT '' COMMENT '树结构' AFTER `parentId`;
-ALTER TABLE `lamp_nestjs`.`c_station`
+ALTER TABLE `c_station`
     CHANGE COLUMN `create_time` `created_at` datetime NULL DEFAULT NULL COMMENT '创建时间' AFTER `describe_`,
     CHANGE COLUMN `update_time` `updated_at` datetime NULL DEFAULT NULL COMMENT '修改时间' AFTER `created_by`,
-    MODIFY COLUMN `org_id` bigint(20) NULL DEFAULT NULL COMMENT '组织' AFTER `name`;
+    MODIFY COLUMN `org_id` bigint(20) NULL DEFAULT NULL COMMENT '机构' AFTER `name`;
+ALTER TABLE `c_user`
+    CHANGE COLUMN `create_time` `created_at` datetime NULL DEFAULT NULL COMMENT '创建时间' AFTER `created_by`,
+    CHANGE COLUMN `update_time` `updated_at` datetime NULL DEFAULT NULL COMMENT '更新时间' AFTER `updated_by`,
+    MODIFY COLUMN `org_id` bigint(20) NULL DEFAULT NULL COMMENT '机构' AFTER `name`,
+    MODIFY COLUMN `station_id` bigint(20) NULL DEFAULT NULL COMMENT '岗位' AFTER `org_id`,
+    MODIFY COLUMN `nation` char(2) NULL DEFAULT '' COMMENT '民族: dictType = NATION' AFTER `avatar`,
+    MODIFY COLUMN `education` char(2) NULL DEFAULT '' COMMENT '学历: dictType = EDUCATION' AFTER `nation`,
+    MODIFY COLUMN `position_status` char(2) NULL DEFAULT '' COMMENT '职位状态: dictType = POSITION_STATUS' AFTER `education`;
 
 -- 修改索引
 ALTER TABLE `c_org` DROP INDEX `fu_path`, ADD FULLTEXT INDEX `fu_path`(`mpath`);

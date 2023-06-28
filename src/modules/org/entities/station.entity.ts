@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
     Column,
     CreateDateColumn,
@@ -24,10 +25,11 @@ export class StationEntity extends BaseEntity {
     @Column('bigint', {
         name: 'org_id',
         nullable: true,
-        comment: '组织',
+        comment: '机构',
     })
     orgId: number | null;
 
+    @Type()
     orgMap: OrgEntity;
 
     @Column('bit', {

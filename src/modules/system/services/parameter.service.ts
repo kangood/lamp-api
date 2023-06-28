@@ -56,7 +56,7 @@ export class ParameterService extends BaseService<
     }
 
     /**
-     * 构建文章列表查询器
+     * 构建参数列表查询器
      * @param queryBuilder 初始查询构造器
      * @param options 排查分页选项后的查询选项
      * @param callback 添加额外的查询

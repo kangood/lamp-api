@@ -64,18 +64,18 @@ export class DictionaryService extends BaseService<
      * @param callback 回调查询
      */
     async paginateType(options?: QueryDictionaryDto, callback?: QueryHook<DictionaryEntity>) {
-        const qb = await this.buildListTypeQB(this.repository.buildBaseQB(), options, callback);
+        const qb = await this.buildListByTypeQB(this.repository.buildBaseQB(), options, callback);
         // 调用按类型分组的分页函数
         return paginateType(this.repository.manager, qb, options);
     }
 
     /**
-     * 构建文章列表查询器
+     * 构建字典列表类型分组查询器
      * @param queryBuilder 初始查询构造器
      * @param options 排查分页选项后的查询选项
      * @param callback 添加额外的查询
      */
-    protected async buildListTypeQB(
+    protected async buildListByTypeQB(
         queryBuilder: SelectQueryBuilder<DictionaryEntity>,
         options: FindParams,
         callback?: QueryHook<DictionaryEntity>,
@@ -97,7 +97,7 @@ export class DictionaryService extends BaseService<
     }
 
     /**
-     * 构建文章列表查询器
+     * 构建字典列表查询器
      * @param queryBuilder 初始查询构造器
      * @param options 排查分页选项后的查询选项
      * @param callback 添加额外的查询
@@ -125,6 +125,19 @@ export class DictionaryService extends BaseService<
         // 排序
         this.addOrderByQuery(qb, orderBy);
         return qb;
+    }
+
+    /**
+     * 查询字典列表按类型筛选
+     */
+    async listWhereType(options: FindParams, callback?: QueryHook<DictionaryEntity>) {
+        const qb = await super.buildListQB(this.repository.buildBaseQB(), options, callback);
+        const { type } = options;
+        // 根据类型批量查询
+        if (!isEmpty(type)) {
+            qb.where(`${this.repository.qbName}.type in ${type}`);
+        }
+        return qb.getMany();
     }
 
     /**
