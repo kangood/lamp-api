@@ -7,6 +7,7 @@ import {
     DeleteDateColumn,
 } from 'typeorm';
 
+import { BoolBitTransformer } from '@/modules/core/helpers/utils';
 import { BaseEntity } from '@/modules/database/base';
 
 @Index('uk_key', ['key'], { unique: true })
@@ -39,6 +40,7 @@ export class ParameterEntity extends BaseEntity {
         nullable: true,
         comment: '状态',
         default: () => "'b'1''",
+        transformer: new BoolBitTransformer(),
     })
     state: boolean | null;
 
@@ -47,6 +49,7 @@ export class ParameterEntity extends BaseEntity {
         nullable: true,
         comment: '内置',
         default: () => "'b'0''",
+        transformer: new BoolBitTransformer(),
     })
     readonly: boolean | null;
 

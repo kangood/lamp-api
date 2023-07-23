@@ -27,7 +27,7 @@ ALTER TABLE `c_menu`
     CHANGE COLUMN `create_time` `created_at` datetime(0) DEFAULT NULL COMMENT '创建时间' AFTER `created_by`,
     CHANGE COLUMN `update_time` `updated_at` datetime(0) DEFAULT NULL COMMENT '更新时间' AFTER `updated_by`;
 ALTER TABLE `c_area`
-    CHANGE COLUMN `level` `level_` varchar(10) DEFAULT '' COMMENT '行政区级: dictType = AREA_LEVEL' AFTER `latitude`;
+    CHANGE COLUMN `level_` `level_` varchar(10) DEFAULT '' COMMENT '行政区级: dictType = AREA_LEVEL' AFTER `latitude`;
 ALTER TABLE `c_area`
     CHANGE COLUMN `create_time` `created_at` datetime(0) DEFAULT NULL COMMENT '创建时间' AFTER `deleted_at`,
     CHANGE COLUMN `update_time` `updated_at` datetime(0) DEFAULT NULL COMMENT '更新时间' AFTER `created_by`;
@@ -62,5 +62,5 @@ ALTER TABLE `c_org` DROP INDEX `fu_path`, ADD FULLTEXT INDEX `fu_path`(`mpath`);
 delete from c_menu where label in ('租户设置','租户管理','数据源配置','超级用户','流程管理','流程部署','模型管理','请假流程','请假管理','请假任务','报销流程','报销管理','报销任务','工作台','通知公告','待我审批','我已审批','我发起的','了解lamp','在线文档','会员版','获取源码','问题反馈','更新日志','蓝图','更多功能','多级菜单','菜单1-1','菜单1-1-1','菜单1-1-2','菜单1-2');
 
 -- 添加数据
-INSERT INTO `c_dictionary` (`id`, `type`, `label`, `code`, `name`, `readonly_`, `created_by`, `created_at`, `updated_by`, `updated_at`) VALUES (449940761571413, 'AREA_SOURCE', '地区数据来源', '01', '爬取', b'1', 2, '2023-06-27 11:29:45', 2, '2023-06-27 11:29:47')
+INSERT INTO `c_dictionary` (`id`, `type`, `label`, `code`, `name`, `readonly_`, `created_by`, `created_at`, `updated_by`, `updated_at`) VALUES (449940761571413, 'AREA_SOURCE', '地区数据来源', '01', '爬取', b'1', 2, '2023-06-27 11:29:45', 2, '2023-06-27 11:29:47');
 INSERT INTO `c_dictionary` (`id`, `type`, `label`, `code`, `name`, `readonly_`, `created_by`, `created_at`, `updated_by`, `updated_at`) VALUES (449940761571414, 'AREA_SOURCE', '地区数据来源', '02', '新增', b'1', 2, '2023-06-27 11:31:24', 2, '2023-06-27 11:31:26')
