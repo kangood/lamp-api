@@ -10,7 +10,7 @@ import { SystemModule } from './modules/system/system.module';
 
 const envFilePath = ['.env'];
 
-export const IS_DEV = process.env.RUNNING_ENV !== 'prod';
+export const IS_DEV = process.env.NODE_ENV !== 'prod';
 
 if (IS_DEV) {
     envFilePath.unshift('.env.dev');

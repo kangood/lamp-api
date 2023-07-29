@@ -47,6 +47,9 @@ dependencies:
   deepmerge:
     specifier: ^4.3.1
     version: 4.3.1
+  dotenv:
+    specifier: ^16.3.1
+    version: 16.3.1
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
