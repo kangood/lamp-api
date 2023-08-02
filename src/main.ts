@@ -15,7 +15,7 @@ async function bootstrap() {
     useContainer(app.select(AppModule), {
         fallbackOnErrors: true,
     });
-    await app.listen(PORT, () => {
+    await app.listen(PORT, '0.0.0.0', () => {
         Logger.log(`服务已经启动,接口请访问:${PROTOCOL}${HOST}:${PORT}`);
     });
 }
