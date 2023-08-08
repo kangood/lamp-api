@@ -11,6 +11,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
+import { BoolBitTransformer } from '@/modules/core/helpers/utils';
 import { BaseEntity } from '@/modules/database/base';
 
 @Tree('materialized-path')
@@ -72,6 +73,7 @@ export class OrgEntity extends BaseEntity {
         nullable: true,
         comment: '状态',
         default: () => "'b'1''",
+        transformer: new BoolBitTransformer(),
     })
     state: boolean | null;
 

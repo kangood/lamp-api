@@ -8,6 +8,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
+import { BoolBitTransformer } from '@/modules/core/helpers/utils';
 import { BaseEntity } from '@/modules/database/base';
 import { UserEchoDto } from '@/modules/org/dtos';
 import { OrgEntity } from '@/modules/org/entities/org.entity';
@@ -42,7 +43,12 @@ export class UserEntity extends BaseEntity {
     @Column('bigint', { name: 'station_id', nullable: true, comment: '岗位' })
     stationId: number | null;
 
-    @Column('bit', { name: 'readonly', comment: '内置', default: () => "'b'0''" })
+    @Column('bit', {
+        name: 'readonly',
+        comment: '内置',
+        default: () => "'b'0''",
+        transformer: new BoolBitTransformer(),
+    })
     readonly: boolean;
 
     @Column('varchar', {
@@ -75,6 +81,7 @@ export class UserEntity extends BaseEntity {
         nullable: true,
         comment: '状态',
         default: () => "'b'1''",
+        transformer: new BoolBitTransformer(),
     })
     state: boolean | null;
 

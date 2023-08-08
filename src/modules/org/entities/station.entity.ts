@@ -8,6 +8,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
+import { BoolBitTransformer } from '@/modules/core/helpers/utils';
 import { BaseEntity } from '@/modules/database/base';
 import { OrgEntity } from '@/modules/org/entities/org.entity';
 
@@ -37,6 +38,7 @@ export class StationEntity extends BaseEntity {
         nullable: true,
         comment: '状态',
         default: () => "'b'1''",
+        transformer: new BoolBitTransformer(),
     })
     state: boolean | null;
 
