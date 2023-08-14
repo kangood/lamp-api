@@ -6,6 +6,7 @@ import { database } from './config';
 import { AppFilter, AppIntercepter, AppPipe } from './modules/core/providers';
 import { DatabaseModule } from './modules/database/database.module';
 import { OrgModule } from './modules/org/org.module';
+import { OSSModule } from './modules/restful/oss/oss.module';
 import { SystemModule } from './modules/system/system.module';
 
 const envFilePath = ['.env'];
@@ -23,6 +24,7 @@ if (IS_DEV) {
         DatabaseModule.forRoot(database),
         SystemModule,
         OrgModule,
+        OSSModule,
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath,

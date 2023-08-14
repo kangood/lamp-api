@@ -10,6 +10,8 @@ const { PROTOCOL, HOST, PORT } = process.env;
 
 async function bootstrap() {
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
+    // 加全局前缀
+    app.setGlobalPrefix('api');
     // 允许跨域
     app.enableCors();
     useContainer(app.select(AppModule), {

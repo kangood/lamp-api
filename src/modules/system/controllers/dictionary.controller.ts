@@ -27,4 +27,10 @@ export class DictionaryController extends BaseController<DictionaryService> {
     listType(@Query() dto: QueryDictionaryDto) {
         return this.service.paginateType(dto);
     }
+
+    @Get('listMultiType')
+    @SerializeOptions({ groups: ['dict-list'] })
+    listMultiType(@Query() dto: QueryDictionaryDto) {
+        return this.service.listWhereTypes(dto);
+    }
 }

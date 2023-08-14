@@ -1,5 +1,5 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
-import { isEmpty, omit } from 'lodash';
+import { isEmpty, omit, groupBy } from 'lodash';
 
 import { SelectQueryBuilder } from 'typeorm';
 
@@ -128,7 +128,7 @@ export class DictionaryService extends BaseService<
     }
 
     /**
-     * 查询字典列表按类型筛选
+     * 根据类型查询字典列表
      */
     async listWhereType(options: FindParams, callback?: QueryHook<DictionaryEntity>) {
         const qb = await super.buildListQB(this.repository.buildBaseQB(), options, callback);
@@ -138,6 +138,17 @@ export class DictionaryService extends BaseService<
             qb.where(`${this.repository.qbName}.type in ${type}`);
         }
         return qb.getMany();
+    }
+
+    /**
+     * 多类型字典列表查询
+     */
+    async listWhereTypes(options: FindParams, callback?: QueryHook<DictionaryEntity>) {
+        if (options?.type) {
+            options.type = `(${options.type})`;
+        }
+        const dictList = await this.listWhereType(options, callback);
+        return groupBy(dictList, 'type');
     }
 
     /**
