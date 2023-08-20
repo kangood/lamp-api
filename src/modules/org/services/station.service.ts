@@ -1,4 +1,9 @@
+import { readFile } from 'fs/promises';
+import { join } from 'path';
+
 import { Injectable } from '@nestjs/common';
+import ExcelJS from 'exceljs';
+import { FastifyReply } from 'fastify';
 import { isEmpty, isNil, omit } from 'lodash';
 
 import { SelectQueryBuilder } from 'typeorm';
@@ -7,11 +12,13 @@ import { BaseService } from '@/modules/database/base';
 
 import { paginate } from '@/modules/database/helpers';
 import { PaginateReturn, QueryHook } from '@/modules/database/types';
+import { UPLOAD_FOLDER } from '@/modules/restful/constants';
 import { PublicOrderType } from '@/modules/system/constants';
 
 import { CreateStationDto, QueryStationDto, UpdateStationDto } from '../dtos';
 import { OrgEntity, StationEntity } from '../entities';
 import { StationRepository } from '../repositories';
+
 // 岗位查询接口
 type FindParams = {
     [key in keyof Omit<QueryStationDto, 'limit' | 'page'>]: QueryStationDto[key];
@@ -55,6 +62,76 @@ export class StationService extends BaseService<StationEntity, StationRepository
     ): Promise<PaginateReturn<StationEntity>> {
         const qb = await this.buildListRelateQB(this.repository.buildBaseQB(), options, callback);
         return paginate(qb, options);
+    }
+
+    /**
+     * Excel导出
+     */
+    async exportExcel(options?: QueryStationDto, response?: FastifyReply) {
+        // 先拿传过来的参数去查询
+        const stationList = await (
+            await this.buildListRelateQB(this.repository.buildBaseQB(), options)
+        ).getMany();
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet();
+        // 定义表格字段以及填充数据
+        worksheet.columns = [
+            { header: '岗位名称', key: 'name', width: 32 },
+            { header: '机构名称', key: 'orgMap', width: 42 },
+            { header: '状态', key: 'state' },
+            { header: '描述', key: 'describe' },
+        ];
+        worksheet.addRows(stationList);
+        // 处理加工数据
+        worksheet.eachRow((row: any, rowNumber: number) => {
+            if (rowNumber > 1) {
+                // 翻译state值
+                const stateCell = row.getCell('state');
+                stateCell.value = stateCell.value ? '启用' : '禁用';
+                // 获取对象中的机构值
+                const orgCell = row.getCell('orgMap');
+                orgCell.value = orgCell.value.label;
+            }
+        });
+        // 最后输出
+        const buffer = await workbook.xlsx.writeBuffer();
+        response.send(buffer);
+    }
+
+    /**
+     * 获取Excel中的数据集合
+     */
+    async getExcelDataList(file: Express.Multer.File) {
+        const importedDataList: CreateStationDto[] = [];
+        // 加载并读取已上传的文件数据
+        const filePath = join(UPLOAD_FOLDER, file.filename);
+        await readFile(filePath).then(async (data) => {
+            // 从Excel中获取到数据
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.load(data);
+            const worksheet = workbook.getWorksheet(1);
+            // 数据填充进List
+            worksheet.eachRow((row: any, rowNumber: number) => {
+                if (rowNumber > 1) {
+                    const name = row.getCell(1).value; // 岗位名称
+                    const orgId = row.getCell(2).value; // 机构ID
+                    const state = row.getCell(3).value !== '否'; // 状态，'否'即false，其他情况true
+                    const describe = row.getCell(4).value; // 描述
+                    importedDataList.push({ name, orgId, state, describe });
+                }
+            });
+        });
+        return importedDataList;
+    }
+
+    /**
+     * Excel导入
+     */
+    async importExcel(file: Express.Multer.File) {
+        const importedDataList = await this.getExcelDataList(file);
+        for (const data of importedDataList) {
+            await this.create(data);
+        }
     }
 
     /**
