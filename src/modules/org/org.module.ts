@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { AuthController } from '../auth/auth.controller';
+import { AuthService } from '../auth/auth.service';
+import { JwtStrategy } from '../auth/jwt.strategy';
 import { DatabaseModule } from '../database/database.module';
 
 import * as systemRepositories from '../system/repositories';
@@ -13,12 +17,27 @@ import * as services from './services';
 
 @Module({
     imports: [
+        JwtModule.registerAsync({
+            async useFactory() {
+                return {
+                    secret: process.env.JWT_SECRET,
+                    signOptions: {
+                        expiresIn: `${60 * 60 * 24 * 7}s`,
+                    },
+                };
+            },
+        }),
         TypeOrmModule.forFeature(Object.values(entities)),
         DatabaseModule.forRepository(Object.values(repositories)),
         DatabaseModule.forRepository(Object.values(systemRepositories)),
     ],
-    controllers: Object.values(controllers),
-    providers: [...Object.values(services), ...Object.values(systemServices)],
+    controllers: [...Object.values(controllers), AuthController],
+    providers: [
+        ...Object.values(services),
+        ...Object.values(systemServices),
+        AuthService,
+        JwtStrategy,
+    ],
     exports: [
         ...Object.values(services),
         ...Object.values(systemServices),

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { isEmpty, isNil, omit } from 'lodash';
 
+import md5 from 'md5';
 import { SelectQueryBuilder } from 'typeorm';
 
 import { BaseService } from '@/modules/database/base';
@@ -38,6 +39,8 @@ export class UserService extends BaseService<UserEntity, UserRepository, FindPar
      * @param data
      */
     async create(data: CreateUserDto) {
+        // 处理密码
+        data.password = md5(data.password);
         // 获取通用参数
         const createParams = await super.create(data);
         // 执行插入
