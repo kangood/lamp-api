@@ -1,4 +1,6 @@
-import { Controller, Get, Query, SerializeOptions } from '@nestjs/common';
+import { Controller, Get, Query, SerializeOptions, UseGuards } from '@nestjs/common';
+
+import { AuthGuard } from '@nestjs/passport';
 
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
@@ -17,6 +19,7 @@ import { DictionaryService } from '../services';
     },
 })
 @Controller('dict')
+@UseGuards(AuthGuard('jwt'))
 export class DictionaryController extends BaseController<DictionaryService> {
     constructor(protected service: DictionaryService) {
         super(service);

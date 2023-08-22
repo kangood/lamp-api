@@ -6,8 +6,10 @@ import {
     Req,
     Res,
     UploadedFile,
+    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { FastifyReply } from 'fastify';
 
@@ -35,6 +37,7 @@ import { StationService } from '../services';
     },
 })
 @Controller('station')
+@UseGuards(AuthGuard('jwt'))
 export class StationController extends BaseController<StationService> {
     constructor(protected service: StationService) {
         super(service);

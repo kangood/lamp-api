@@ -1,4 +1,6 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
+
+import { AuthGuard } from '@nestjs/passport';
 
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
@@ -17,6 +19,7 @@ import { ParameterService } from '../services';
     },
 })
 @Controller('param')
+@UseGuards(AuthGuard('jwt'))
 export class ParameterController extends BaseController<ParameterService> {
     constructor(protected service: ParameterService) {
         super(service);

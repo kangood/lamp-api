@@ -1,4 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+
+import { AuthGuard } from '@nestjs/passport';
 
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
@@ -17,6 +19,7 @@ import { AreaService } from '../services';
     },
 })
 @Controller('area')
+@UseGuards(AuthGuard('jwt'))
 export class AreaController extends BaseController<AreaService> {
     constructor(protected service: AreaService) {
         super(service);

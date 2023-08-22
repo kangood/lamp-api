@@ -13,6 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
+    // 在每次请求会走的验证，从请求头中验证token中的用户
     async validate(user: UserEntity): Promise<any> {
         if (!user.id) {
             throw new UnauthorizedException();
