@@ -52,7 +52,8 @@ export class UserService extends BaseService<UserEntity, UserRepository, FindPar
      * @param data
      */
     async update(data: UpdateUserDto) {
-        await this.repository.update(data.id, omit(data, ['id']));
+        data.password = md5(data.password);
+        await this.repository.update(data.id, omit(data, ['id', 'confirmPassword']));
         return this.detail(data.id);
     }
 

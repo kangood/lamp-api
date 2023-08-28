@@ -51,7 +51,7 @@ export class CreateUserDto {
     @IsOptional({ groups: ['update'] })
     account!: string;
 
-    @IsNotEmpty({ groups: ['create', 'update'], message: '姓名不能为空' })
+    @IsNotEmpty({ groups: ['create'], message: '姓名不能为空' })
     name?: string;
 
     @IsOptional()
@@ -69,6 +69,9 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     @IsNumber(undefined, { groups: ['update'], message: '用户ID格式错误' })
     @IsDefined({ groups: ['update'], message: '用户ID必须指定' })
     id!: number;
+
+    @IsNotEmpty({ groups: ['update'], message: '确认密码不能为空' })
+    confirmPassword?: string;
 }
 
 /**
