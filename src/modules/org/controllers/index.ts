@@ -1,3 +1,4 @@
 export * from './org.controller';
 export * from './station.controller';
 export * from './user.controller';
+export * from './role.controller';

@@ -22,7 +22,7 @@ import * as services from './services';
                 return {
                     secret: process.env.JWT_SECRET,
                     signOptions: {
-                        expiresIn: `${60 * 60 * 24 * 7}s`,
+                        expiresIn: `${60 * 60 * 24}s`,
                     },
                 };
             },

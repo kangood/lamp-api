@@ -10,4 +10,5 @@ export enum DictionaryType {
     NATION = 'NATION',
     EDUCATION = 'EDUCATION',
     POSITION_STATUS = 'POSITION_STATUS',
+    ROLE_CATEGORY = 'ROLE_CATEGORY',
 }
