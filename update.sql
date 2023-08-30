@@ -17,6 +17,8 @@ ALTER TABLE `c_user`
     ADD COLUMN `deleted_at` datetime NULL COMMENT '删除时间' AFTER `last_login_time`;
 ALTER TABLE `c_role`
     ADD COLUMN `deleted_at` datetime NULL COMMENT '删除时间' AFTER `readonly_`;
+ALTER TABLE `c_user_role` 
+    ADD COLUMN `deleted_at` datetime NULL COMMENT '删除时间' AFTER `user_id`;
 
 -- 修改字段
 ALTER TABLE `c_dictionary`
@@ -59,6 +61,8 @@ ALTER TABLE `c_user`
 ALTER TABLE `c_role` 
     CHANGE COLUMN `create_time` `created_at` datetime NULL DEFAULT NULL COMMENT '创建时间' AFTER `created_by`,
     CHANGE COLUMN `update_time` `updated_at` datetime NULL DEFAULT NULL COMMENT '更新时间' AFTER `updated_by`;
+ALTER TABLE `c_user_role` 
+    CHANGE COLUMN `create_time` `created_at` datetime NULL DEFAULT NULL COMMENT '创建时间' AFTER `created_by`;
 
 -- 修改索引
 ALTER TABLE `c_org` DROP INDEX `fu_path`, ADD FULLTEXT INDEX `fu_path`(`mpath`);
