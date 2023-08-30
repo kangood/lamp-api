@@ -70,7 +70,8 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     @IsDefined({ groups: ['update'], message: '用户ID必须指定' })
     id!: number;
 
-    @IsNotEmpty({ groups: ['update'], message: '确认密码不能为空' })
+    @IsNotEmpty({ groups: ['resetPwd'], message: '确认密码不能为空' })
+    @IsOptional()
     confirmPassword?: string;
 }
 
