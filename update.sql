@@ -72,6 +72,8 @@ ALTER TABLE .`c_menu`
 ALTER TABLE `c_resource` 
     CHANGE COLUMN `create_time` `created_at` datetime NULL DEFAULT NULL COMMENT '创建时间' AFTER `created_by`,
     CHANGE COLUMN `update_time` `updated_at` datetime NULL DEFAULT NULL COMMENT '更新时间' AFTER `updated_by`;
+ALTER TABLE `c_role_authority` 
+    CHANGE COLUMN `create_time` `created_at` datetime NULL DEFAULT NULL COMMENT '创建时间' AFTER `role_id`;
 
 -- 修改索引
 ALTER TABLE `c_org` DROP INDEX `fu_path`, ADD FULLTEXT INDEX `fu_path`(`mpath`);
