@@ -14,6 +14,8 @@ import { UserEchoDto } from '@/modules/org/dtos';
 import { OrgEntity } from '@/modules/org/entities/org.entity';
 import { StationEntity } from '@/modules/org/entities/station.entity';
 
+import { UserRoleEntity } from './user-role.entity';
+
 @Index('uk_account', ['account'], { unique: true })
 @Entity('c_user', { schema: 'lamp_generator' })
 export class UserEntity extends BaseEntity {
@@ -25,6 +27,9 @@ export class UserEntity extends BaseEntity {
 
     @Type()
     userEchoDto: UserEchoDto;
+
+    @Type()
+    userRoles: UserRoleEntity[];
 
     @Column('varchar', {
         name: 'account',

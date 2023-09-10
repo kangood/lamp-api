@@ -1,8 +1,11 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+
+import { JwtService } from '@nestjs/jwt';
 
 import { database } from './config';
+import { LoginGuard } from './modules/auth/login.guard';
 import { AppFilter, AppIntercepter, AppPipe } from './modules/core/providers';
 import { DatabaseModule } from './modules/database/database.module';
 import { OrgModule } from './modules/org/org.module';
@@ -47,6 +50,11 @@ if (IS_DEV) {
             provide: APP_FILTER,
             useClass: AppFilter,
         },
+        {
+            provide: APP_GUARD,
+            useClass: LoginGuard,
+        },
+        JwtService,
         Logger,
     ],
 })

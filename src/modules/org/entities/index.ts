@@ -4,3 +4,4 @@ export * from './user.entity';
 export * from './role.entity';
 export * from './user-role.entity';
 export * from './role-authority';
+export * from './user-role-relation.entity';

@@ -14,7 +14,8 @@ import { QueryDictionaryDto } from '@/modules/system/dtos';
 import { DictionaryService } from '@/modules/system/services';
 
 import { CreateUserDto, QueryUserDto, UpdateUserDto, UserEchoDto } from '../dtos';
-import { OrgEntity, StationEntity, UserEntity } from '../entities';
+import { OrgEntity, RoleEntity, StationEntity, UserEntity } from '../entities';
+import { UserRoleRelationEntity } from '../entities/user-role-relation.entity';
 import { UserRepository } from '../repositories';
 
 // 用户查询接口
@@ -57,6 +58,29 @@ export class UserService extends BaseService<UserEntity, UserRepository, FindPar
         }
         await this.repository.update(data.id, omit(data, ['id', 'confirmPassword']));
         return this.detail(data.id);
+    }
+
+    /**
+     * 调用关联角色查询并分页
+     */
+    async getUserAndRoles(options?: QueryUserDto) {
+        // 调用父类通用qb处理方法
+        const qb = await super.buildListQB(this.repository.buildBaseQB(), options);
+        // 子类自我实现
+        const { account } = options;
+        const queryName = this.repository.qbName;
+        // 对几个可选参数的where判断
+        if (!isEmpty(account)) {
+            qb.andWhere(`${queryName}.account = '${account}'`);
+        }
+        // 关联角色查询
+        qb.leftJoinAndMapMany(
+            `user.userRoles`,
+            UserRoleRelationEntity,
+            'user_role',
+            'user_role.user_id=user.id',
+        ).leftJoinAndMapOne(`user_role.role`, RoleEntity, 'role', 'user_role.id=role.id');
+        return qb.getMany();
     }
 
     /**

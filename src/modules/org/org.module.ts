@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthController } from '../auth/auth.controller';
 import { AuthService } from '../auth/auth.service';
-import { JwtStrategy } from '../auth/jwt.strategy';
 import { DatabaseModule } from '../database/database.module';
 
 import * as systemRepositories from '../system/repositories';
@@ -36,7 +35,7 @@ import * as services from './services';
         ...Object.values(services),
         ...Object.values(systemServices),
         AuthService,
-        JwtStrategy,
+        // JwtStrategy,
     ],
     exports: [
         ...Object.values(services),

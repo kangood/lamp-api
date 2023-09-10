@@ -19,7 +19,11 @@ export class AuthService {
 
     async login(loginUserDto: LoginUserDto): Promise<IResult<string>> {
         // 验证账号
-        const userList = await this.userService.list({ account: loginUserDto.account });
+        const userList = await this.userService.getUserAndRoles({
+            account: loginUserDto.account,
+            page: 1,
+            limit: 1,
+        });
         if (isEmpty(userList)) {
             return { code: ACCOUNT_NOT_EXIST, message: '该账号不存在' };
         }
@@ -31,6 +35,8 @@ export class AuthService {
         // 返回token
         const token = this.jwtService.sign({
             id: user.id,
+            name: user.name,
+            userRoles: user.userRoles,
         });
         return { code: SUCCESS, message: '登录成功', result: token };
     }

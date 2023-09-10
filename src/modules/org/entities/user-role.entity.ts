@@ -1,10 +1,16 @@
+import { Type } from 'class-transformer';
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index } from 'typeorm';
 
 import { BaseEntity } from '@/modules/database/base';
 
+import { RoleEntity } from './role.entity';
+
 @Index('uk_user_role', ['roleId', 'userId'], { unique: true })
 @Entity('c_user_role', { schema: 'lamp_nestjs' })
 export class UserRoleEntity extends BaseEntity {
+    @Type()
+    role: RoleEntity;
+
     @Column('bigint', { name: 'role_id', comment: '角色\n#c_role' })
     roleId: number;
 
