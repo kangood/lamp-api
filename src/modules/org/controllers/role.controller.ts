@@ -1,7 +1,6 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 
-import { AuthGuard } from '@nestjs/passport';
-
+import { RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -19,7 +18,7 @@ import { RoleService } from '../services';
     },
 })
 @Controller('role')
-@UseGuards(AuthGuard('jwt'))
+@RequireLogin()
 export class RoleController extends BaseController<RoleService> {
     constructor(protected service: RoleService) {
         super(service);

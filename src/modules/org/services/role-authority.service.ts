@@ -8,6 +8,8 @@ import { BaseService } from '@/modules/database/base';
 import { QueryHook } from '@/modules/database/types';
 import { PublicOrderType } from '@/modules/system/constants';
 
+import { ResourceEntity } from '@/modules/system/entities';
+
 import { AUTHORITY_TYPE_MENU, AUTHORITY_TYPE_RESOURCE } from '../constants';
 import { CreateRoleAuthorityDto, QueryRoleAuthorityDto } from '../dtos/role-authority.dto';
 import { RoleAuthorityEntity } from '../entities';
@@ -64,9 +66,9 @@ export class RoleAuthorityService extends BaseService<
     }
 
     /**
-     * id集合查询
+     * 根据角色ID查询角色授权ID集合
      */
-    async listRoleAuthorityId(
+    async listRoleAuthorityIdByRoleId(
         options?: QueryRoleAuthorityDto,
         callback?: QueryHook<RoleAuthorityEntity>,
     ) {
@@ -82,6 +84,33 @@ export class RoleAuthorityService extends BaseService<
         //     .filter((item) => item.authorityType === AUTHORITY_TYPE_MENU)
         //     .map((item) => item.authorityId);
         return idList;
+    }
+
+    /**
+     * 根据角色ID查询角色授权数据集合
+     */
+    async listRoleResourceByRoleIds(
+        options?: QueryRoleAuthorityDto,
+        callback?: QueryHook<RoleAuthorityEntity>,
+    ) {
+        // 调用父类通用qb处理方法
+        const qb = await super.buildListQB(this.repository.buildBaseQB(), options, callback);
+        // 子类自我实现
+        const { roleIds } = options;
+        // queryName=role_authority
+        const queryName = this.repository.qbName;
+        // 参数的where判断
+        qb.where(`${queryName}.authority_type = '${AUTHORITY_TYPE_RESOURCE}'`);
+        if (!isEmpty(roleIds)) {
+            qb.andWhere(`${queryName}.role_id in (${roleIds})`);
+            qb.leftJoinAndMapOne(
+                `${queryName}.resource`,
+                ResourceEntity,
+                'resource',
+                `${queryName}.authority_id=resource.id`,
+            );
+        }
+        return qb.getMany();
     }
 
     /**

@@ -6,15 +6,14 @@ import {
     Req,
     Res,
     UploadedFile,
-    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { FastifyReply } from 'fastify';
 
 import { diskStorage } from 'multer';
 
+import { RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { UPLOAD_FOLDER } from '@/modules/restful/constants';
 import { Crud } from '@/modules/restful/decorators';
@@ -37,7 +36,7 @@ import { StationService } from '../services';
     },
 })
 @Controller('station')
-@UseGuards(AuthGuard('jwt'))
+@RequireLogin()
 export class StationController extends BaseController<StationService> {
     constructor(protected service: StationService) {
         super(service);

@@ -10,6 +10,18 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 
+import { UserRoleRelationEntity } from '../org/entities';
+
+declare module 'express' {
+    interface Request {
+        user: {
+            id: number;
+            name: string;
+            userRoles: UserRoleRelationEntity[];
+        };
+    }
+}
+
 @Injectable()
 export class LoginGuard implements CanActivate {
     @Inject(JwtService)
@@ -41,6 +53,7 @@ export class LoginGuard implements CanActivate {
             request.user = data;
             return true;
         } catch (e) {
+            console.log(e);
             throw new UnauthorizedException('token 失效，请重新登录');
         }
     }

@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 
-import { AuthGuard } from '@nestjs/passport';
-
+import { RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -18,7 +17,7 @@ import { RoleAuthorityService } from '../services';
     },
 })
 @Controller('role-authority')
-@UseGuards(AuthGuard('jwt'))
+@RequireLogin()
 export class RoleAuthorityController extends BaseController<RoleAuthorityService> {
     constructor(protected service: RoleAuthorityService) {
         super(service);
@@ -26,7 +25,7 @@ export class RoleAuthorityController extends BaseController<RoleAuthorityService
 
     @Get('listRoleAuthorityId')
     listRoleAuthorityId(@Query() options: QueryRoleAuthorityDto) {
-        return this.service.listRoleAuthorityId(options);
+        return this.service.listRoleAuthorityIdByRoleId(options);
     }
 
     @Post('saveBatchRoleAutority')

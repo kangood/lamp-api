@@ -1,12 +1,17 @@
+import { Type } from 'class-transformer';
 import { Column, CreateDateColumn, Entity, Index } from 'typeorm';
 
 import { BaseEntity } from '@/modules/database/base';
+import { ResourceEntity } from '@/modules/system/entities';
 
 @Index('uk_role_authority', ['authorityId', 'authorityType', 'roleId'], {
     unique: true,
 })
 @Entity('c_role_authority', { schema: 'lamp_nestjs' })
 export class RoleAuthorityEntity extends BaseEntity {
+    @Type()
+    resource: ResourceEntity;
+
     @Column('bigint', {
         name: 'authority_id',
         comment: '资源id \n#c_resource #c_menu',

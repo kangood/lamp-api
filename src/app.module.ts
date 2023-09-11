@@ -32,6 +32,14 @@ if (IS_DEV) {
             isGlobal: true,
             envFilePath,
         }),
+        // 这里的secret无效，读取不到，异步也一样
+        // JwtModule.register({
+        //     global: true,
+        //     secret: process.env.JWT_SECRET,
+        //     signOptions: {
+        //         expiresIn: `${60 * 60 * 24}s`,
+        //     },
+        // }),
     ],
     providers: [
         {
@@ -54,6 +62,10 @@ if (IS_DEV) {
             provide: APP_GUARD,
             useClass: LoginGuard,
         },
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: AuthorityGuard,
+        // },
         JwtService,
         Logger,
     ],

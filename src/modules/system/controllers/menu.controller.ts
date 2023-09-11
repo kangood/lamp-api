@@ -1,7 +1,6 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 
-import { AuthGuard } from '@nestjs/passport';
-
+import { RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -18,7 +17,7 @@ import { MenuService } from '../services';
     },
 })
 @Controller('menu')
-@UseGuards(AuthGuard('jwt'))
+@RequireLogin()
 export class MenuController extends BaseController<MenuService> {
     constructor(protected service: MenuService) {
         super(service);
