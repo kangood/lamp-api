@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 
-import { RequireLogin } from '@/modules/auth/auth.decorator';
+import { RequireAuthority, RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -15,6 +15,7 @@ import { MenuService } from '../services';
         update: UpdateMenuDto,
         list: QueryMenuTreeDto,
     },
+    preAuth: 'system:menu:',
 })
 @Controller('menu')
 @RequireLogin()
@@ -24,6 +25,7 @@ export class MenuController extends BaseController<MenuService> {
     }
 
     @Get('tree')
+    @RequireAuthority('system:menu:tree')
     tree(@Query() options: QueryMenuTreeDto) {
         return this.service.findTrees(options);
     }

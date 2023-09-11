@@ -25,7 +25,7 @@ export class UserRoleService extends BaseService<UserRoleEntity, UserRoleReposit
     /**
      * 删除并新建
      */
-    async createListAfterDelete(data: CreateUserRoleDto) {
+    async saveListAfterDelete(data: CreateUserRoleDto) {
         // 先删除角色数据
         if (!isNil(data.roleId)) {
             await this.repository.delete({ roleId: data.roleId });

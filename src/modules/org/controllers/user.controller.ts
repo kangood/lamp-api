@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 
-import { RequireLogin } from '@/modules/auth/auth.decorator';
+import { RequireAuthority, RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -16,6 +16,7 @@ import { UserService } from '../services';
         update: UpdateUserDto,
         list: QueryUserDto,
     },
+    preAuth: 'org:user:',
 })
 @Controller('user')
 @RequireLogin()
@@ -25,7 +26,14 @@ export class UserController extends BaseController<UserService> {
     }
 
     @Get('listRelate')
-    listRelate(@Query() options: QueryUserDto) {
+    @RequireAuthority('org:user:listRelate')
+    async listRelate(@Query() options: QueryUserDto) {
         return this.service.listRelate(options);
     }
+
+    // @Get('list')
+    // @RequireAuthority('org:user:list')
+    // async list(@Query() options: ListWithTrashedQueryDto, ...args: any[]) {
+    //     return super.list(options, args);
+    // }
 }

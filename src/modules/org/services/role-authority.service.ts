@@ -75,15 +75,15 @@ export class RoleAuthorityService extends BaseService<
         // 调用重写的qb处理方法
         const qb = await this.buildListQB(this.repository.buildBaseQB(), options, callback);
         const originList = await qb.getMany();
-        const idList = originList.map((item) => item.authorityId);
+        // const idList = originList.map((item) => item.authorityId);
         // 过滤菜单、资源集合并返回ID
-        // const menuIdList = originList
-        //     .filter((item) => item.authorityType === AUTHORITY_TYPE_MENU)
-        //     .map((item) => item.authorityId);
-        // const resourceIdList = originList
-        //     .filter((item) => item.authorityType === AUTHORITY_TYPE_MENU)
-        //     .map((item) => item.authorityId);
-        return idList;
+        const menuIdList = originList
+            .filter((item) => item.authorityType === AUTHORITY_TYPE_MENU)
+            .map((item) => item.authorityId);
+        const resourceIdList = originList
+            .filter((item) => item.authorityType === AUTHORITY_TYPE_RESOURCE)
+            .map((item) => item.authorityId);
+        return { menuIdList, resourceIdList };
     }
 
     /**

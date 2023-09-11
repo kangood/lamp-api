@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 
-import { RequireLogin } from '@/modules/auth/auth.decorator';
+import { RequireAuthority, RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -15,6 +15,7 @@ import { OrgService } from '../services';
         update: UpdateOrgDto,
         list: QueryOrgTreeDto,
     },
+    preAuth: 'org:org:',
 })
 @Controller('org')
 @RequireLogin()
@@ -24,6 +25,7 @@ export class OrgController extends BaseController<OrgService> {
     }
 
     @Get('tree')
+    @RequireAuthority('org:org:tree')
     tree(@Query() options: QueryOrgTreeDto) {
         return this.service.findTrees(options);
     }

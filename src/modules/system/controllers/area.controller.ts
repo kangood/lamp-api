@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 
-import { RequireLogin } from '@/modules/auth/auth.decorator';
+import { RequireAuthority, RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -16,6 +16,7 @@ import { AreaService } from '../services';
         update: UpdateAreaDto,
         list: QueryAreaTreeDto,
     },
+    preAuth: 'system:area:',
 })
 @Controller('area')
 @RequireLogin()
@@ -25,6 +26,7 @@ export class AreaController extends BaseController<AreaService> {
     }
 
     @Get('tree')
+    @RequireAuthority('system:area:tree')
     tree(@Query() options: QueryAreaTreeDto) {
         return this.service.findTrees(options);
     }

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 
-import { RequireLogin } from '@/modules/auth/auth.decorator';
+import { RequireAuthority, RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -15,6 +15,7 @@ import { RoleAuthorityService } from '../services';
         store: CreateRoleAuthorityDto,
         list: QueryRoleAuthorityDto,
     },
+    preAuth: 'org:roleAuthority:',
 })
 @Controller('role-authority')
 @RequireLogin()
@@ -24,11 +25,13 @@ export class RoleAuthorityController extends BaseController<RoleAuthorityService
     }
 
     @Get('listRoleAuthorityId')
+    @RequireAuthority('org:roleAuthority:listRoleAuthorityId')
     listRoleAuthorityId(@Query() options: QueryRoleAuthorityDto) {
         return this.service.listRoleAuthorityIdByRoleId(options);
     }
 
     @Post('saveBatchRoleAutority')
+    @RequireAuthority('org:roleAuthority:saveBatchRoleAutority')
     saveBatchRoleAutority(@Body() options: CreateRoleAuthorityDto) {
         return this.service.saveBatchRoleAutority(options);
     }

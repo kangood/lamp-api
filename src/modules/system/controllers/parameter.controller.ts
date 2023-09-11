@@ -16,6 +16,7 @@ import { ParameterService } from '../services';
         update: UpdateParameterDto,
         list: QueryParameterDto,
     },
+    preAuth: 'system:param:',
 })
 @Controller('param')
 @RequireLogin()

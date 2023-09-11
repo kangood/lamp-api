@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 
-import { RequireLogin } from '@/modules/auth/auth.decorator';
+import { RequireAuthority, RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -16,6 +16,7 @@ import { RoleService } from '../services';
         update: UpdateRoleDto,
         list: QueryRoleDto,
     },
+    preAuth: 'org:role:',
 })
 @Controller('role')
 @RequireLogin()
@@ -25,6 +26,7 @@ export class RoleController extends BaseController<RoleService> {
     }
 
     @Get('listRelate')
+    @RequireAuthority('org:role:listRelate')
     listRelate(@Query() options: QueryRoleDto) {
         return this.service.listRelate(options);
     }

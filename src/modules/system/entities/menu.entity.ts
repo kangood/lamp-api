@@ -136,7 +136,6 @@ export class MenuEntity extends BaseEntity {
         name: 'parentId',
         nullable: true,
         comment: '父级菜单ID',
-        default: () => "'0'",
     })
     parentId: number | null;
 

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 
-import { RequireLogin } from '@/modules/auth/auth.decorator';
+import { RequireAuthority, RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -16,6 +16,7 @@ import { UserRoleService } from '../services';
         update: UpdateUserRoleDto,
         list: QueryUserRoleDto,
     },
+    preAuth: 'org:userRole:',
 })
 @Controller('user-role')
 @RequireLogin()
@@ -25,12 +26,14 @@ export class UserRoleController extends BaseController<UserRoleService> {
     }
 
     @Get('listUserRoleByRoleId')
+    @RequireAuthority('org:userRole:listUserRoleByRoleId')
     listUserRoleByRoleId(@Query() options: QueryUserRoleDto) {
         return this.service.listUserRoleByRoleId(options);
     }
 
-    @Post('createListAfterDelete')
-    createListAfterDelete(@Body() options: CreateUserRoleDto) {
-        return this.service.createListAfterDelete(options);
+    @Post('saveListAfterDelete')
+    @RequireAuthority('org:userRole:saveListAfterDelete')
+    saveListAfterDelete(@Body() options: CreateUserRoleDto) {
+        return this.service.saveListAfterDelete(options);
     }
 }

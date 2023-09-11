@@ -13,7 +13,7 @@ import { FastifyReply } from 'fastify';
 
 import { diskStorage } from 'multer';
 
-import { RequireLogin } from '@/modules/auth/auth.decorator';
+import { RequireAuthority, RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { UPLOAD_FOLDER } from '@/modules/restful/constants';
 import { Crud } from '@/modules/restful/decorators';
@@ -34,6 +34,7 @@ import { StationService } from '../services';
         update: UpdateStationDto,
         list: QueryStationDto,
     },
+    preAuth: 'org:station:',
 })
 @Controller('station')
 @RequireLogin()
@@ -43,16 +44,19 @@ export class StationController extends BaseController<StationService> {
     }
 
     @Get('listRelate')
+    @RequireAuthority('org:station:listRelate')
     listRelate(@Query() options: QueryStationDto) {
         return this.service.listRelate(options);
     }
 
     @Get('exportExcel')
+    @RequireAuthority('org:station:exportExcel')
     exportExcel(@Query() options: QueryStationDto, @Res() response: FastifyReply) {
         return this.service.exportExcel(options, response);
     }
 
     @Post('importExcel')
+    @RequireAuthority('org:station:importExcel')
     @UseInterceptors(
         FastifyFileInterceptor('file', {
             storage: diskStorage({

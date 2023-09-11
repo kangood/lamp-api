@@ -79,7 +79,7 @@ export class UserService extends BaseService<UserEntity, UserRepository, FindPar
             UserRoleRelationEntity,
             'user_role',
             'user_role.user_id=user.id',
-        ).leftJoinAndMapOne(`user_role.role`, RoleEntity, 'role', 'user_role.id=role.id');
+        ).leftJoinAndMapOne(`user_role.role`, RoleEntity, 'role', 'user_role.role_id=role.id');
         return qb.getMany();
     }
 

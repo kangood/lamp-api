@@ -35,4 +35,6 @@ export interface CrudOptions {
     dtos: {
         [key in 'list' | 'store' | 'update']?: Type;
     };
+    // 资源权限使用的前缀
+    preAuth: string;
 }

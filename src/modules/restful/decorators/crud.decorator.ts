@@ -2,6 +2,8 @@ import { Get, Type, Post, Patch, Delete, SerializeOptions } from '@nestjs/common
 import { ClassTransformOptions } from 'class-transformer';
 import { isNil } from 'lodash';
 
+import { RequireAuthority } from '@/modules/auth/auth.decorator';
+
 import { BaseController } from '../base';
 
 import { CRUD_OPTIONS } from '../constants';
@@ -17,7 +19,10 @@ export const Crud =
     <T extends BaseController<any>>(Target: Type<T>) => {
         Reflect.defineMetadata(CRUD_OPTIONS, options, Target);
 
-        const { id, enabled, dtos } = Reflect.getMetadata(CRUD_OPTIONS, Target) as CrudOptions;
+        const { id, enabled, dtos, preAuth } = Reflect.getMetadata(
+            CRUD_OPTIONS,
+            Target,
+        ) as CrudOptions;
         const methods: CrudItem[] = [];
         // 添加启用的CRUD方法
         for (const value of enabled) {
@@ -82,7 +87,7 @@ export const Crud =
                 serialize = option.serialize;
             }
             SerializeOptions(serialize)(Target, name, descriptor);
-
+            // 识别控制层固定的几个方法名，加请求方式装饰器
             switch (name) {
                 case 'list':
                     Get()(Target, name, descriptor);
@@ -105,6 +110,8 @@ export const Crud =
                 default:
                     break;
             }
+            // 给控制层enabled中定义的API，加资源权限装饰器
+            RequireAuthority(`${preAuth}${name}`)(Target, name, descriptor);
 
             if (!isNil(option.hook)) option.hook(Target, name);
         }

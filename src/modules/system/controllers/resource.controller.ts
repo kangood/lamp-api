@@ -16,6 +16,7 @@ import { ResourceService } from '../services';
         update: UpdateResourceDto,
         list: QueryResourceDto,
     },
+    preAuth: 'system:resource:',
 })
 @Controller('resource')
 @RequireLogin()
