@@ -4,8 +4,6 @@ import { IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-valid
 
 import { DtoValidation } from '@/modules/core/decorators';
 
-import { IsUnique, IsUniqueExist } from '@/modules/database/constraints';
-import { UserEntity } from '@/modules/org/entities';
 import { ListWithTrashedQueryDto } from '@/modules/restful/dtos';
 import { PublicOrderType } from '@/modules/system/constants';
 
@@ -39,14 +37,15 @@ export class QueryUserDto extends ListWithTrashedQueryDto {
  */
 @DtoValidation({ groups: ['create'] })
 export class CreateUserDto {
-    @IsUnique(UserEntity, {
-        groups: ['create'],
-        message: '账号名称重复',
-    })
-    @IsUniqueExist(UserEntity, {
-        groups: ['update'],
-        message: '账号名称重复',
-    })
+    // 单就用户的constraint有问题，先不用了
+    // @IsUnique(UserEntity, {
+    //     groups: ['create'],
+    //     message: '账号名称重复',
+    // })
+    // @IsUniqueExist(UserEntity, {
+    //     groups: ['update'],
+    //     message: '账号名称重复',
+    // })
     @IsNotEmpty({ groups: ['create', 'update'], message: '账号名称不能为空' })
     @IsOptional({ groups: ['update'] })
     account!: string;
