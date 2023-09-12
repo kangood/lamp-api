@@ -1,7 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 
 import { LoginUserDto } from '../org/dtos';
-import { IResult } from '../restful/base/result.type';
 
 import { AuthService } from './auth.service';
 
@@ -10,7 +9,12 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Post('login')
-    async login(@Body() loginUserDto: LoginUserDto): Promise<IResult<string>> {
+    async login(@Body() loginUserDto: LoginUserDto) {
         return this.authService.login(loginUserDto);
+    }
+
+    @Get('refresh')
+    async refresh(@Query('refreshToken') refreshToken: string) {
+        return this.authService.refresh(refreshToken);
     }
 }

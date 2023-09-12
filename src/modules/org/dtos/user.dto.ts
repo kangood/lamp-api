@@ -19,6 +19,9 @@ export class QueryUserDto extends ListWithTrashedQueryDto {
     orderBy?: PublicOrderType;
 
     @IsOptional()
+    id?: number;
+
+    @IsOptional()
     account?: string;
 
     @Transform(({ value }) => value.split(','))

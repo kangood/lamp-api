@@ -19,10 +19,8 @@ import * as services from './services';
         JwtModule.registerAsync({
             async useFactory() {
                 return {
+                    // 这里sign起作用，verify不起作用
                     secret: process.env.JWT_SECRET,
-                    signOptions: {
-                        expiresIn: `${60 * 60 * 24}s`,
-                    },
                 };
             },
         }),
