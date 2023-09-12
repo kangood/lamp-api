@@ -3,7 +3,7 @@ import {
     CanActivate,
     ExecutionContext,
     Inject,
-    UnauthorizedException,
+    ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
@@ -39,13 +39,13 @@ export class AuthorityGuard implements CanActivate {
         });
         const resources = roleAuthorities.map((item) => item.resource);
         if (!resources) {
-            throw new UnauthorizedException('您没有访问该接口的权限');
+            throw new ForbiddenException('您没有访问该接口的权限');
         }
         // 循环对比是否对应
         for (const curResource of requiredResources) {
             const found = resources.find((item) => item.code.includes(curResource));
             if (!found) {
-                throw new UnauthorizedException('您没有访问该接口的权限');
+                throw new ForbiddenException('您没有访问该接口的权限');
             }
         }
         return true;

@@ -4,7 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { UserEntity } from '../org/entities';
 /**
- * @deserted 由LoginGuard中逻辑替代
+ * @Deprecated 由LoginGuard中逻辑替代
  */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
