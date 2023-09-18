@@ -50,6 +50,7 @@ export class LoginGuard implements CanActivate {
             const data = this.jwtService.verify(token, {
                 secret: process.env.JWT_SECRET,
             });
+            // token解析后的用户数据放到request.user中，后续从request中获取
             request.user = data;
             return true;
         } catch (e) {

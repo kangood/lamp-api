@@ -8,6 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 
+import { AUTHORITY_TYPE_RESOURCE } from '../org/constants';
 import { RoleAuthorityService } from '../org/services';
 
 @Injectable()
@@ -32,8 +33,9 @@ export class AuthorityGuard implements CanActivate {
             return true;
         }
         // 查询用户的角色对应的资源
-        const roleAuthorities = await this.roleAuthorityService.listRoleResourceByRoleIds({
+        const roleAuthorities = await this.roleAuthorityService.listRoleAuthorityByRoleIds({
             roleIds: request.user.userRoles.map((item) => item.role.id),
+            authorityType: AUTHORITY_TYPE_RESOURCE,
             page: 1,
             limit: 10000,
         });

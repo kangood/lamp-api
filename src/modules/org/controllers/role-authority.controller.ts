@@ -4,6 +4,7 @@ import { RequireAuthority, RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
+import { AUTHORITY_TYPE_MENU } from '../constants';
 import { CreateRoleAuthorityDto, QueryRoleAuthorityDto } from '../dtos';
 
 import { RoleAuthorityService } from '../services';
@@ -24,10 +25,17 @@ export class RoleAuthorityController extends BaseController<RoleAuthorityService
         super(service);
     }
 
-    @Get('listRoleAuthorityId')
-    @RequireAuthority('org:roleAuthority:listRoleAuthorityId')
-    listRoleAuthorityId(@Query() options: QueryRoleAuthorityDto) {
+    @Get('listRoleAuthorityIdByRoleId')
+    @RequireAuthority('org:roleAuthority:listRoleAuthorityIdByRoleId')
+    listRoleAuthorityIdByRoleId(@Query() options: QueryRoleAuthorityDto) {
         return this.service.listRoleAuthorityIdByRoleId(options);
+    }
+
+    @Post('listRoleMenuByRoleIds')
+    @RequireAuthority('org:roleAuthority:listRoleMenuByRoleIds')
+    listRoleMenuByRoleIds(@Body() options: QueryRoleAuthorityDto) {
+        options.authorityType = AUTHORITY_TYPE_MENU;
+        return this.service.listRoleAuthorityByRoleIds(options);
     }
 
     @Post('saveBatchRoleAutority')

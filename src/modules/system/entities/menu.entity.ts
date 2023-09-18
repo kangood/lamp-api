@@ -16,6 +16,8 @@ export class MenuEntity extends BaseEntity {
     @TreeChildren({ cascade: true })
     children: MenuEntity[];
 
+    depth = 0;
+
     @Column('varchar', { name: 'label', comment: '名称', length: 20 })
     label: string;
 

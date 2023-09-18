@@ -60,6 +60,9 @@ export class AuthService {
      * 刷新token
      */
     async refresh(refreshToken: string) {
+        if (!refreshToken) {
+            return null;
+        }
         // 验证账号
         const data = this.jwtService.verify(refreshToken, {
             secret: process.env.JWT_SECRET,

@@ -21,6 +21,9 @@ export class QueryRoleAuthorityDto extends ListWithTrashedQueryDto {
 
     @IsOptional()
     roleIds?: number[];
+
+    @IsOptional()
+    authorityType?: string;
 }
 
 /**

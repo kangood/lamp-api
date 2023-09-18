@@ -89,18 +89,18 @@ export class RoleAuthorityService extends BaseService<
     /**
      * 根据角色ID查询角色授权数据集合
      */
-    async listRoleResourceByRoleIds(
+    async listRoleAuthorityByRoleIds(
         options?: QueryRoleAuthorityDto,
         callback?: QueryHook<RoleAuthorityEntity>,
     ) {
         // 调用父类通用qb处理方法
         const qb = await super.buildListQB(this.repository.buildBaseQB(), options, callback);
         // 子类自我实现
-        const { roleIds } = options;
+        const { roleIds, authorityType } = options;
         // queryName=role_authority
         const queryName = this.repository.qbName;
         // 参数的where判断
-        qb.where(`${queryName}.authority_type = '${AUTHORITY_TYPE_RESOURCE}'`);
+        qb.where(`${queryName}.authority_type = '${authorityType}'`);
         if (!isEmpty(roleIds)) {
             qb.andWhere(`${queryName}.role_id in (${roleIds})`);
             qb.leftJoinAndMapOne(
