@@ -36,5 +36,6 @@ lerna-debug.log*
 
 # other
 .history
-.env
+.env.dev
+.env.prod
 /entities
