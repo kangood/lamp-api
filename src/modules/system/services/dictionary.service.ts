@@ -80,7 +80,7 @@ export class DictionaryService extends BaseService<
         options: FindParams,
         callback?: QueryHook<DictionaryEntity>,
     ) {
-        const { orderBy, label } = options;
+        const { label } = options;
         const queryName = this.repository.qbName;
         const qb = await super.buildListQB(queryBuilder, options, callback);
         // 根据输入文字模糊查询
@@ -92,7 +92,7 @@ export class DictionaryService extends BaseService<
         // 分组
         qb.groupBy('type,label');
         // 排序
-        this.addOrderByQuery(qb, orderBy);
+        // this.addOrderByQuery(qb, orderBy);
         return qb;
     }
 
