@@ -18,6 +18,7 @@ async function bootstrap() {
         fallbackOnErrors: true,
     });
     // 添加fastify上传文件的支持，FastifyAdapter不支持multipart/form-data
+    // @ts-ignore （fastify-multer 在 TS 上没有适配 fastify 4.x，所以关闭，但不影响运行）
     app.register(contentParser);
     await app.listen(PORT, '0.0.0.0', () => {
         Logger.log(`服务已经启动,接口请访问:${PROTOCOL}${HOST}:${PORT}`);
