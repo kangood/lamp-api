@@ -39,3 +39,4 @@ lerna-debug.log*
 .env.dev
 .env.prod
 /entities
+*.http

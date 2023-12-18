@@ -10,6 +10,7 @@ import { LoginGuard } from './modules/auth/login.guard';
 import { AppFilter, AppIntercepter, AppPipe } from './modules/core/providers';
 import { DatabaseModule } from './modules/database/database.module';
 import { OrgModule } from './modules/org/org.module';
+import { ResourceModule } from './modules/resource/resource.module';
 import { OSSModule } from './modules/restful/oss/oss.module';
 import { SystemModule } from './modules/system/system.module';
 
@@ -29,6 +30,7 @@ if (IS_DEV) {
         SystemModule,
         OrgModule,
         OSSModule,
+        ResourceModule,
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath,

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "debug 3r",
+            "name": "debug start",
             "request": "launch",
             "runtimeArgs": ["run-script", "start:debug"],
             "autoAttachChildProcesses": true,
