@@ -54,7 +54,7 @@ export class DictionaryService extends BaseService<
      * @param data
      */
     async update(data: UpdateDictionaryDto) {
-        await this.repository.update(data.id, omit(data, ['id', 'type', 'label', 'code']));
+        await this.repository.update(data.id, omit(data, ['id', 'type', 'code']));
         return this.detail(data.id);
     }
 
@@ -122,6 +122,7 @@ export class DictionaryService extends BaseService<
         if (!isEmpty(name)) {
             qb.andWhere(`${queryName}.name like '%${name}%'`);
         }
+        qb.andWhere(`${queryName}.code <> '00'`);
         // 排序
         this.addOrderByQuery(qb, orderBy);
         return qb;

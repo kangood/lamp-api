@@ -46,9 +46,6 @@ export class CreateDictionaryDto {
     @IsNotEmpty({ groups: ['create'], message: '编码必须填写' })
     @IsOptional({ groups: ['update'] })
     code!: string;
-
-    @IsNotEmpty({ groups: ['create', 'update'], message: '名称必须填写' })
-    name!: string;
 }
 
 /**
