@@ -1,10 +1,16 @@
+import { Type } from 'class-transformer';
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, UpdateDateColumn } from 'typeorm';
 
 import { BoolBitTransformer } from '@/modules/core/helpers/utils';
 import { BaseEntity } from '@/modules/database/base';
 
+import { OsscEchoDto } from '../dtos';
+
 @Entity('c_ossc', { schema: 'lamp' })
 export class OsscEntity extends BaseEntity {
+    @Type()
+    osscEchoDto: OsscEchoDto;
+
     @Column('varchar', {
         name: 'code',
         nullable: true,

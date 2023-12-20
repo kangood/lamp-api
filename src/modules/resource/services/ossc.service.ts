@@ -5,10 +5,15 @@ import { SelectQueryBuilder } from 'typeorm';
 
 import { BaseService } from '@/modules/database/base';
 
-import { QueryHook } from '@/modules/database/types';
-import { PublicOrderType } from '@/modules/system/constants';
+import { paginate } from '@/modules/database/helpers';
+import { PaginateReturn, QueryHook } from '@/modules/database/types';
+import { DictionaryType, PublicOrderType } from '@/modules/system/constants';
 
-import { CreateOsscDto, QueryOsscDto, UpdateOsscDto } from '../dtos';
+import { QueryDictionaryDto } from '@/modules/system/dtos';
+
+import { DictionaryService } from '@/modules/system/services';
+
+import { CreateOsscDto, OsscEchoDto, QueryOsscDto, UpdateOsscDto } from '../dtos';
 import { OsscEntity } from '../entities';
 import { OsscRepository } from '../repositories';
 
@@ -22,7 +27,10 @@ type FindParams = {
  */
 @Injectable()
 export class OsscService extends BaseService<OsscEntity, OsscRepository, FindParams> {
-    constructor(protected repository: OsscRepository) {
+    constructor(
+        protected repository: OsscRepository,
+        protected dictionaryService: DictionaryService,
+    ) {
         super(repository);
     }
 
@@ -44,6 +52,38 @@ export class OsscService extends BaseService<OsscEntity, OsscRepository, FindPar
     async update(data: UpdateOsscDto) {
         await this.repository.update(data.id, omit(data, ['id']));
         return this.detail(data.id);
+    }
+
+    /**
+     * 调用关联查询并分页
+     */
+    async listRelate(
+        options?: QueryOsscDto,
+        callback?: QueryHook<OsscEntity>,
+    ): Promise<PaginateReturn<OsscEntity>> {
+        // 调用 buildListQB
+        const qb = await this.buildListQB(this.repository.buildBaseQB(), options, callback);
+        // 调用分页函数，得到返回的数据
+        const osscEntityPaginateReturn = await paginate(qb, options);
+        const { items } = osscEntityPaginateReturn;
+        // 查询字典列表按类型筛选
+        const queryDictionaryDto = new QueryDictionaryDto();
+        queryDictionaryDto.type = `('${DictionaryType.OSSC_CATEGORY}')`;
+        queryDictionaryDto.trashed = options.trashed;
+        const dictionaryEntities = await this.dictionaryService.listWhereType(queryDictionaryDto);
+        // 查询完之后挨个参数替换翻译
+        for (const item of items) {
+            item.osscEchoDto = new OsscEchoDto();
+            for (const dictionaryEntity of dictionaryEntities) {
+                // 翻译种类
+                if (dictionaryEntity.type === DictionaryType.OSSC_CATEGORY) {
+                    if (dictionaryEntity.code === item.category.toString()) {
+                        item.osscEchoDto.category = dictionaryEntity.name;
+                    }
+                }
+            }
+        }
+        return osscEntityPaginateReturn;
     }
 
     /**

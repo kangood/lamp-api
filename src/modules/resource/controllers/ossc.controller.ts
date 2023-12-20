@@ -1,6 +1,6 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 
-import { RequireLogin } from '@/modules/auth/auth.decorator';
+import { RequireAuthority, RequireLogin } from '@/modules/auth/auth.decorator';
 import { BaseController } from '@/modules/restful/base';
 import { Crud } from '@/modules/restful/decorators';
 
@@ -23,5 +23,11 @@ import { OsscService } from '../services';
 export class OsscController extends BaseController<OsscService> {
     constructor(protected service: OsscService) {
         super(service);
+    }
+
+    @Get('listRelate')
+    @RequireAuthority('resource:ossc:listRelate')
+    async listRelate(@Query() options: QueryOsscDto) {
+        return this.service.listRelate(options);
     }
 }

@@ -47,3 +47,10 @@ export class UpdateOsscDto extends PartialType(CreateOsscDto) {
     @IsDefined({ groups: ['update'], message: 'ID必须指定' })
     id!: number;
 }
+
+/**
+ * 翻译成字典值的DTO
+ */
+export class OsscEchoDto {
+    category: string;
+}
