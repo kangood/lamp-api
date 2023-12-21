@@ -91,8 +91,6 @@ export class DictionaryService extends BaseService<
         }
         // 分组
         qb.groupBy('type,label');
-        // 排除 code='00' 的数据
-        qb.andWhere(`${this.repository.qbName}.code <> '00'`);
         // 排序
         // this.addOrderByQuery(qb, orderBy);
         return qb;
