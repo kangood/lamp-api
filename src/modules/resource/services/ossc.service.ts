@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { omit } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 
 import { SelectQueryBuilder } from 'typeorm';
 
@@ -100,9 +100,18 @@ export class OsscService extends BaseService<OsscEntity, OsscRepository, FindPar
         // 调用父类通用qb处理方法
         const qb = await super.buildListQB(queryBuilder, options, callback);
         // 子类自我实现
-        const { orderBy } = options;
-        // const queryName = this.repository.qbName;
+        const { category, code, accessKey, orderBy } = options;
+        const queryName = this.repository.qbName;
         // 对几个可选参数的where判断
+        if (!isEmpty(category)) {
+            qb.andWhere(`${queryName}.category = ${category}`);
+        }
+        if (!isEmpty(code)) {
+            qb.andWhere(`${queryName}.code like '%${code}%'`);
+        }
+        if (!isEmpty(accessKey)) {
+            qb.andWhere(`${queryName}.access_key like '%${accessKey}%'`);
+        }
         // 排序
         this.addOrderByQuery(qb, orderBy);
         return qb;

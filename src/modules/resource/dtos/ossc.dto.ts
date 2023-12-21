@@ -19,6 +19,15 @@ export class QueryOsscDto extends ListWithTrashedQueryDto {
     })
     @IsOptional()
     orderBy?: PublicOrderType;
+
+    @IsOptional()
+    category?: string;
+
+    @IsOptional()
+    code?: string;
+
+    @IsOptional()
+    accessKey?: string;
 }
 
 /**
