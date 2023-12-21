@@ -77,7 +77,7 @@ export class OsscService extends BaseService<OsscEntity, OsscRepository, FindPar
             for (const dictionaryEntity of dictionaryEntities) {
                 // 翻译种类
                 if (dictionaryEntity.type === DictionaryType.OSSC_CATEGORY) {
-                    if (dictionaryEntity.code === item.category.toString()) {
+                    if (dictionaryEntity.code === item.category) {
                         item.osscEchoDto.category = dictionaryEntity.name;
                     }
                 }

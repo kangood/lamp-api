@@ -19,8 +19,8 @@ export class OsscEntity extends BaseEntity {
     })
     code: string | null;
 
-    @Column('int', { name: 'category', nullable: true, comment: '种类' })
-    category: number | null;
+    @Column('varchar', { name: 'category', nullable: true, comment: '种类', length: 2 })
+    category: string | null;
 
     @Column('varchar', { name: 'bucket_name', nullable: true, comment: '空间名', length: 64 })
     bucketName: string | null;
