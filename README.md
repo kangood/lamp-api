@@ -1,4 +1,4 @@
-## TeaLamp API NestJS
+## Lamp API
 **说明**
 
 已将页面模块等迁移到新项目：https://github.com/KangodYan/prune-api
@@ -10,4 +10,4 @@
 - 数据库：MySQL 8.0
 - 权限认证：NestJS/JWT
 
-茶灯管理后台：[TeaLamp Admin React](https://github.com/KangodYan/tealamp-admin-react)
+Lamp 管理后台：[Lamp Admin](https://github.com/KangodYan/lamp-admin)
